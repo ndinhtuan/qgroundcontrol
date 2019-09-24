@@ -122,6 +122,17 @@ Item {
                 }
             }
 
+            QGCToolBarButton {
+                id:                 testButton
+                anchors.top:        parent.top
+                anchors.bottom:     parent.bottom
+                icon.source:        "/qmlimages/resources/Test.svg"
+                onClicked: {
+                    checked = true
+                    mainWindow.showTestView()
+                }
+            }
+
             Rectangle {
                 anchors.margins:    ScreenTools.defaultFontPixelHeight / 2
                 anchors.top:        parent.top
