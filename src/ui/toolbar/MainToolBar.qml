@@ -67,7 +67,8 @@ Item {
                 id:                 settingsButton
                 anchors.top:        parent.top
                 anchors.bottom:     parent.bottom
-                icon.source:        "/res/QGCLogoWhite"
+//                icon.source:        "/res/QGCLogoWhite"
+                icon.source:        "/res/resources/uet.svg"
                 logo:               true
                 visible:            !QGroundControl.corePlugin.options.combineSettingsAndSetup
                 onClicked: {
@@ -118,6 +119,17 @@ Item {
                 onClicked: {
                     checked = true
                     mainWindow.showAnalyzeView()
+                }
+            }
+
+            QGCToolBarButton {
+                id:                 testButton
+                anchors.top:        parent.top
+                anchors.bottom:     parent.bottom
+                icon.source:        "/qmlimages/resources/Test.svg"
+                onClicked: {
+                    checked = true
+                    mainWindow.showTestView()
                 }
             }
 

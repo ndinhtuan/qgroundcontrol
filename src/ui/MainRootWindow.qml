@@ -78,6 +78,7 @@ ApplicationWindow {
         analyzeWindow.visible   = false
         flightView.visible      = false
         planViewLoader.visible  = false
+        testWindow.visible      = false
         if(isPlanView) {
             toolbar.source  = _planToolbar
         } else {
@@ -109,6 +110,12 @@ ApplicationWindow {
         viewSwitch(false)
         settingsWindow.visible = true
     }
+
+    function showTestView() {
+        viewSwitch(false)
+        testWindow.visible = true
+    }
+
 
     //-------------------------------------------------------------------------
     //-- Global simple message dialog
@@ -320,6 +327,15 @@ ApplicationWindow {
         anchors.fill:   parent
         visible:        false
         source:         "AnalyzeView.qml"
+    }
+
+    //-------------------------------------------------------------------------
+    //-- Test
+    Loader {
+        id:             testWindow
+        anchors.fill:   parent
+        visible:        false
+        source:         "TestView.qml"
     }
 
     //-------------------------------------------------------------------------
