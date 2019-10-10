@@ -93,6 +93,9 @@ Item {
     readonly property int actionVtolTransitionToFwdFlight:  20
     readonly property int actionVtolTransitionToMRFlight:   21
 
+    readonly property int testMotor1:                       22
+    readonly property int testMotor2:                       23
+
     property bool showEmergenyStop:     _guidedActionsEnabled && !_hideEmergenyStop && _vehicleArmed && _vehicleFlying
     property bool showArm:              _guidedActionsEnabled && !_vehicleArmed
     property bool showDisarm:           _guidedActionsEnabled && _vehicleArmed && !_vehicleFlying
@@ -415,6 +418,14 @@ Item {
             break
         case actionVtolTransitionToMRFlight:
             activeVehicle.vtolInFwdFlight = false
+            break
+        case testMotor1:
+            activeVehicle.motorTest(1,0.2,10)
+//            activeVehicle.setArmed(true)
+            break
+        case testMotor2:
+            activeVehicle.motorTest(2,0.2,10)
+//            activeVehicle.setArmed(false)
             break
         default:
             console.warn(qsTr("Internal error: unknown actionCode"), actionCode)
