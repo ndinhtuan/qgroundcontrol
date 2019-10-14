@@ -412,6 +412,17 @@ void PX4FirmwarePlugin::guidedModeTakeoff(Vehicle* vehicle, double takeoffAltRel
         static_cast<float>(takeoffAltAMSL));    // AMSL altitude
 }
 
+void PX4FirmwarePlugin::testMotor(Vehicle *vehicle, int idMotor) {
+
+    connect(vehicle, &Vehicle::mavCommandResult, this, &PX4FirmwarePlugin::_mavCommandResult);
+//    vehicle->sendMavCommand(
+//                vehicle->defaultComponentId(),
+//                MAV_CMD_DO_SET_SERVO,
+//                true,
+//                idMotor,
+//                100);
+}
+
 void PX4FirmwarePlugin::guidedModeGotoLocation(Vehicle* vehicle, const QGeoCoordinate& gotoCoord)
 {
     if (qIsNaN(vehicle->altitudeAMSL()->rawValue().toDouble())) {

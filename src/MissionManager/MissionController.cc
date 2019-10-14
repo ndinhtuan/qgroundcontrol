@@ -409,6 +409,7 @@ int MissionController::insertROIMissionItem(QGeoCoordinate coordinate, int visua
 int MissionController::insertComplexMissionItem(QString itemName, QGeoCoordinate mapCenterCoordinate, int visualItemIndex)
 {
     ComplexMissionItem* newItem;
+    int i = 0; // Tu add, ko hieu sao lai ko khai bao bien i ????
 
     // If the ComplexMissionItem is inserted first, add a TakeOff SimpleMissionItem
     if (_visualItems->count() == 1 && (_controllerVehicle->fixedWing() || _controllerVehicle->vtol() || _controllerVehicle->multiRotor())) {

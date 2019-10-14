@@ -845,7 +845,7 @@ public:
     QGeoCoordinate homePosition(void);
 
     bool armed      () { return _armed; }
-    void setArmed   (bool armed);
+    Q_INVOKABLE void setArmed   (bool armed);
 
     bool flightModeSetAvailable(void);
     QStringList flightModes(void);

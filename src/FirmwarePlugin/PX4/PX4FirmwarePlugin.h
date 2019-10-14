@@ -70,6 +70,8 @@ public:
     bool                supportsTerrainFrame            (void) const override { return false; }
     bool                supportsNegativeThrust          (Vehicle *vehicle) override;
 
+    // Manual funtion
+    void                testMotor(Vehicle *vehicle, int idMotor);
 protected:
     typedef struct {
         uint8_t         main_mode;
