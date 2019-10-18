@@ -1603,4 +1603,6 @@ private:
     static const char* _joystickModeSettingsKey;
     static const char* _joystickEnabledSettingsKey;
 
+    // extra code
+    bool _allowUpdatePriorityLink = true;
 };
