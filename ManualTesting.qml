@@ -90,6 +90,7 @@ Rectangle {
             id:                 wing1
             onClicked: {
                 console.log("Menu Test:........... wing 1: clicked!!!")
+                console.log("Menu Test:........... wing 1: running: ", running)
             }            
         }
         TestWingIcon{
@@ -98,7 +99,8 @@ Rectangle {
             anchors.margins:        -_margin
             id:                     wing2
             onClicked: {
-                console.log("Menu Test:........... wing  2: clicked!!!")
+                console.log("Menu Test:........... wing 2: clicked!!!")
+                console.log("Menu Test:........... wing 2: running: ", running)
             }
         }
         TestWingIcon{
@@ -108,6 +110,7 @@ Rectangle {
             id:                 wing3
             onClicked: {
                 console.log("Menu Test:........... wing 3: clicked!!!")
+                console.log("Menu Test:........... wing 3: running: ", running)
             }
         }
         TestWingIcon{
@@ -117,6 +120,7 @@ Rectangle {
             id:                     wing4
             onClicked: {
                 console.log("Menu Test:........... wing 4: clicked!!!")
+                console.log("Menu Test:........... wing 4: running: ", running)
             }
         }
 

@@ -20,9 +20,9 @@ Button {
     height:             ScreenTools.defaultFontPixelHeight * 4
     width:              height
     autoExclusive:      true
-
+    state:              "stop"
     readonly property int _margin: button.width / 4.2
-
+    property bool running: false
     background: Rectangle {
         anchors.fill: parent
         //        color:  logo ? qgcPal.brandingPurple : (checked ? qgcPal.buttonHighlight : Qt.rgba(0,0,0,0))
@@ -38,9 +38,36 @@ Button {
         sourceSize.height:      parent.height
         fillMode:               Image.PreserveAspectFit
         //            color:                  logo ? "white" : (button.checked ? qgcPal.buttonHighlightText : qgcPal.buttonText)
-//        color:                  button.checked ? qgcPal.buttonHighlightText : qgcPal.buttonText
+        //        color:                  button.checked ? qgcPal.buttonHighlightText : qgcPal.buttonText
         color: "#2980b9"
         source:                 "/qmlimages/resources/fan.svg"
     }
-
+    states: [
+        State {
+            name: "stop"
+            when: running == false
+            PropertyChanges {
+                target: button
+            }
+        },
+        State {
+            name: "running"
+            when: running == true
+            PropertyChanges { target: button; rotation: 360 }
+        }
+    ]
+    transitions: Transition {
+        from: "stop"; to: "running";
+        ParallelAnimation {
+            NumberAnimation {
+                properties:     "rotation"
+                duration:       200
+                easing.type:    Easing.InOutQuad
+                loops:          Animation.Infinite
+            }
+        }
+    }
+    onClicked: {
+        running = !running
+    }
 }
