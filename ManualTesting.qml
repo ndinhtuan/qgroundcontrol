@@ -49,28 +49,81 @@ Rectangle {
     readonly property string    _PIPVisibleKey:         "IsPIPVisible"
 
 
-    Row{
-        id:                 buttonRow
-        spacing:            ScreenTools.defaultFontPixelWidth
-        anchors.margins:    ScreenTools.defaultFontPixelWidth
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.verticalCenter: parent.verticalCenter
+//    Row{
+//        id:                 buttonRow
+//        spacing:            ScreenTools.defaultFontPixelWidth
+//        anchors.margins:    ScreenTools.defaultFontPixelWidth
+//        anchors.horizontalCenter: parent.horizontalCenter
+//        anchors.verticalCenter: parent.verticalCenter
 
-        QGCButton{
-            id:     wing1
-            text:   qsTr("Test motor")
+//        QGCButton{
+//            id:     wing1
+//            text:   qsTr("Test motor")
 
+//            onClicked: {
+//                _guidedController.executeAction(22)
+//            }
+//        }
+//        QGCButton{
+//            id:     wing2
+//            text:   qsTr("Stop testing")
+//            onClicked: {
+//                _guidedController.executeAction(23)
+//            }
+//        }
+
+
+//    }
+    Item{
+        id:                                 droneIcon
+        anchors.horizontalCenter:           parent.horizontalCenter
+        anchors.verticalCenter:             parent.verticalCenter
+        TestDroneMainIcon{
+            anchors.horizontalCenter:   parent.horizontalCenter
+            anchors.verticalCenter:     parent.verticalCenter
+            id:                         mainDrone
+        }
+        TestWingIcon{
+            anchors.top:        mainDrone.top
+            anchors.left:       mainDrone.left
+            anchors.margins:    -_margin
+            id:                 wing1
             onClicked: {
-                _guidedController.executeAction(22)
+                console.log("Menu Test:........... wing 1: clicked!!!")
+                console.log("Menu Test:........... wing 1: running: ", running)
+            }            
+        }
+        TestWingIcon{
+            anchors.top:            mainDrone.top
+            anchors.right:          mainDrone.right
+            anchors.margins:        -_margin
+            id:                     wing2
+            onClicked: {
+                console.log("Menu Test:........... wing 2: clicked!!!")
+                console.log("Menu Test:........... wing 2: running: ", running)
             }
         }
-        QGCButton{
-            id:     wing2
-            text:   qsTr("Stop testing")
+        TestWingIcon{
+            anchors.bottom:     mainDrone.bottom
+            anchors.left:       mainDrone.left
+            anchors.margins:    -_margin
+            id:                 wing3
             onClicked: {
-                _guidedController.executeAction(23)
+                console.log("Menu Test:........... wing 3: clicked!!!")
+                console.log("Menu Test:........... wing 3: running: ", running)
             }
         }
+        TestWingIcon{
+            anchors.bottom:         mainDrone.bottom
+            anchors.right:          mainDrone.right
+            anchors.margins:        -_margin
+            id:                     wing4
+            onClicked: {
+                console.log("Menu Test:........... wing 4: clicked!!!")
+                console.log("Menu Test:........... wing 4: running: ", running)
+            }
+        }
+
     }
 
     GuidedActionsController {
