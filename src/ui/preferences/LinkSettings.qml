@@ -138,7 +138,7 @@ Rectangle {
         QGCButton {
             text:       qsTr("Allow update link")
             onClicked: {
-                QGroundControl.linkManager.disconnectLink(_currentSelection.link, false)
+                activeVehicle.reversedAllowUpdatePriorityLink();
             }
         }
     }

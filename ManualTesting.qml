@@ -74,6 +74,11 @@ Rectangle {
 
 
 //    }
+
+    MavlinkConsoleController {
+        id: conController
+    }
+
     Item{
         id:                                 droneIcon
         anchors.horizontalCenter:           parent.horizontalCenter
@@ -91,6 +96,13 @@ Rectangle {
             onClicked: {
                 console.log("Menu Test:........... wing 1: clicked!!!")
                 console.log("Menu Test:........... wing 1: running: ", running)
+
+                if(running){
+                    conController.sendCommand("pwm test -c 1 -p 1300")
+                }
+                else{
+                    conController.sendCommand("c")
+                }
             }            
         }
         TestWingIcon{
@@ -101,6 +113,13 @@ Rectangle {
             onClicked: {
                 console.log("Menu Test:........... wing 2: clicked!!!")
                 console.log("Menu Test:........... wing 2: running: ", running)
+
+                if(running){
+                    conController.sendCommand("pwm test -c 2 -p 1500")
+                }
+                else{
+                    conController.sendCommand("c")
+                }
             }
         }
         TestWingIcon{
@@ -111,6 +130,13 @@ Rectangle {
             onClicked: {
                 console.log("Menu Test:........... wing 3: clicked!!!")
                 console.log("Menu Test:........... wing 3: running: ", running)
+
+                if(running){
+                    conController.sendCommand("pwm test -c 3 -p 1500")
+                }
+                else{
+                    conController.sendCommand("c")
+                }
             }
         }
         TestWingIcon{
@@ -121,6 +147,13 @@ Rectangle {
             onClicked: {
                 console.log("Menu Test:........... wing 4: clicked!!!")
                 console.log("Menu Test:........... wing 4: running: ", running)
+
+                if(running){
+                    conController.sendCommand("pwm test -c 4 -p 1500")
+                }
+                else{
+                    conController.sendCommand("c")
+                }
             }
         }
 

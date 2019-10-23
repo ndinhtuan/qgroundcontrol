@@ -775,6 +775,11 @@ public:
     Q_INVOKABLE void gimbalYawStep      (int direction);
     Q_INVOKABLE void centerGimbal       ();
 
+    // extra code
+    Q_INVOKABLE void reversedAllowUpdatePriorityLink(){
+        this->_allowUpdatePriorityLink = !this->_allowUpdatePriorityLink;
+    }
+
 #if !defined(NO_ARDUPILOT_DIALECT)
     Q_INVOKABLE void flashBootloader(void);
 #endif
@@ -1106,6 +1111,7 @@ public:
     qreal       gimbalYaw               () { return static_cast<qreal>(_curGinmbalYaw); }
     bool        gimbalData              () { return _haveGimbalData; }
 
+
 public slots:
     void setVtolInFwdFlight             (bool vtolInFwdFlight);
 
@@ -1220,6 +1226,7 @@ signals:
     void gimbalPitchChanged         ();
     void gimbalYawChanged           ();
     void gimbalDataChanged          ();
+
 
 private slots:
     void _mavlinkMessageReceived(LinkInterface* link, mavlink_message_t message);
