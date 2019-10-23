@@ -68,6 +68,7 @@ Item {
         return Screen.pixelDensity
     }
 
+    property bool isLinux:                          ScreenToolsController.isLinux
     property bool isAndroid:                        ScreenToolsController.isAndroid
     property bool isiOS:                            ScreenToolsController.isiOS
     property bool isMobile:                         ScreenToolsController.isMobile

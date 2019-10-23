@@ -10,6 +10,7 @@
 #include "MavlinkConsoleController.h"
 #include "QGCApplication.h"
 #include "UAS.h"
+#include <iostream>
 
 MavlinkConsoleController::MavlinkConsoleController()
     : QStringListModel(),
@@ -20,6 +21,7 @@ MavlinkConsoleController::MavlinkConsoleController()
     auto *manager = qgcApp()->toolbox()->multiVehicleManager();
     connect(manager, &MultiVehicleManager::activeVehicleChanged, this, &MavlinkConsoleController::_setActiveVehicle);
     _setActiveVehicle(manager->activeVehicle());
+    this->loadHistoryCommandFromFile("history.txt");
 }
 
 MavlinkConsoleController::~MavlinkConsoleController()
@@ -28,6 +30,32 @@ MavlinkConsoleController::~MavlinkConsoleController()
         QByteArray msg;
         _sendSerialData(msg, true);
     }
+    this->saveHistoryCommandToFile("history.txt");
+}
+
+void
+MavlinkConsoleController::loadHistoryCommandFromFile(const QString &fileName){
+
+    QFile file(fileName);
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)){
+        std::cout << "Cannot open file" << std::endl;
+        file.close();
+        return;
+    }
+
+    QTextStream inStream(&file);
+    while (!inStream.atEnd()){
+        QString line = inStream.readLine();
+        this->_history.appendInConstructor(line);
+    }
+
+    file.close();
+}
+
+void
+MavlinkConsoleController::saveHistoryCommandToFile(const QString &fileName){
+
+    this->_history.saveCommandHistory(fileName);
 }
 
 void
@@ -206,6 +234,21 @@ MavlinkConsoleController::writeLine(int line, const QByteArray &text)
     setData(idx, data(idx, Qt::DisplayRole).toString() + text);
 }
 
+void MavlinkConsoleController::CommandHistory::appendInConstructor(const QString& command) {
+    if (command.length() > 0) {
+
+        // do not append duplicates
+        if (_history.length() == 0 || _history.last() != command) {
+
+            if (_history.length() >= maxHistoryLength) {
+                _history.removeFirst();
+            }
+            _history.append(command);
+        }
+    }
+    _index = _history.length();
+}
+
 void MavlinkConsoleController::CommandHistory::append(const QString& command)
 {
     if (command.length() > 0) {
@@ -217,6 +260,7 @@ void MavlinkConsoleController::CommandHistory::append(const QString& command)
                 _history.removeFirst();
             }
             _history.append(command);
+            this->_isUpdatedCommand = true;
         }
     }
     _index = _history.length();
@@ -244,4 +288,25 @@ QString MavlinkConsoleController::CommandHistory::down(const QString& current)
         return _history[_index];
     }
     return "";
+}
+
+void MavlinkConsoleController::CommandHistory::saveCommandHistory(const QString& fileName){
+
+//    std::cout << "Save " << this->_history.length() << " commands." << std::endl;
+    if (!this->_isUpdatedCommand){
+        return;
+    }
+    if (this->_history.length() == 0) { // check property _history is destroyed then we dont save destroyed _history
+        return;
+    }
+    QFile file(fileName);
+    if(!file.open(QIODevice::WriteOnly | QIODevice::Text)){
+        return;
+    }
+
+    QTextStream out(&file);
+    for(int i = 0; i < this->_history.length(); i++){
+        out << _history[i] << "\n";
+    }
+    file.close();
 }
