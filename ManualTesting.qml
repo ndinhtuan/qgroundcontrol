@@ -33,7 +33,7 @@ Rectangle {
     property real   _margins:                       ScreenTools.defaultFontPixelWidth / 2
     property real   _pipSize:                       mainWindow.width * 0.2
     property alias  _guidedController:              guidedActionsController
-    property alias  _altitudeSlider:                altitudeSlider
+    property alias _speedSlider: speedSlider
 
     readonly property var       _dynamicCameras:        activeVehicle ? activeVehicle.dynamicCameras : null
     readonly property bool      _isCamera:              _dynamicCameras ? _dynamicCameras.cameras.count > 0 : false
@@ -98,7 +98,7 @@ Rectangle {
                 console.log("Menu Test:........... wing 1: running: ", running)
 
                 if(running){
-                    conController.sendCommand("pwm test -c 1 -p 1300")
+                    conController.sendCommand("pwm test -c 1 -p " + _speedSlider.getSpeedValue())
                 }
                 else{
                     conController.sendCommand("c")
@@ -115,7 +115,8 @@ Rectangle {
                 console.log("Menu Test:........... wing 2: running: ", running)
 
                 if(running){
-                    conController.sendCommand("pwm test -c 2 -p 1500")
+                    conController.sendCommand("pwm test -c 2 -p " + _speedSlider.getSpeedValue())
+                    console.log("pwm test -c 2 -p " + _speedSlider.getSpeedValue())
                 }
                 else{
                     conController.sendCommand("c")
@@ -132,7 +133,7 @@ Rectangle {
                 console.log("Menu Test:........... wing 3: running: ", running)
 
                 if(running){
-                    conController.sendCommand("pwm test -c 3 -p 1500")
+                    conController.sendCommand("pwm test -c 3 -p " + _speedSlider.getSpeedValue())
                 }
                 else{
                     conController.sendCommand("c")
@@ -149,7 +150,7 @@ Rectangle {
                 console.log("Menu Test:........... wing 4: running: ", running)
 
                 if(running){
-                    conController.sendCommand("pwm test -c 4 -p 1500")
+                    conController.sendCommand("pwm test -c 4 -p " + _speedSlider.getSpeedValue())
                 }
                 else{
                     conController.sendCommand("c")
@@ -193,26 +194,9 @@ Rectangle {
         }
     }
 
-    GuidedActionConfirm {
-        id:                         guidedActionConfirm
-        anchors.margins:            _margins
-        anchors.bottom:             parent.bottom
-        anchors.horizontalCenter:   parent.horizontalCenter
-        guidedController:           _guidedController
-        altitudeSlider:             _altitudeSlider
-    }
-
-    GuidedActionList {
-        id:                         guidedActionList
-        anchors.margins:            _margins
-        anchors.bottom:             parent.bottom
-        anchors.horizontalCenter:   parent.horizontalCenter
-        guidedController:           _guidedController
-    }
-
-    //-- Altitude slider
-    GuidedAltitudeSlider {
-        id:                 altitudeSlider
+    //-- Speed slider
+    MotorSpeedSlider {
+        id:                 speedSlider
         anchors.margins:    _margins
         anchors.right:      parent.right
         anchors.topMargin:  ScreenTools.toolbarHeight + _margins
@@ -222,7 +206,6 @@ Rectangle {
         radius:             ScreenTools.defaultFontPixelWidth / 2
         width:              ScreenTools.defaultFontPixelWidth * 10
         color:              qgcPal.window
-        visible:            false
+        visible:            true
     }
-
 }
