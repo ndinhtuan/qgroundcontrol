@@ -42,17 +42,25 @@ private:
     bool _processANSItext(QByteArray &line);
     void _sendSerialData(QByteArray, bool close = false);
     void writeLine(int line, const QByteArray &text);
+    void loadHistoryCommandFromFile(const QString &fileName);
+    void saveHistoryCommandToFile(const QString &fileName);
 
     class CommandHistory
     {
     public:
+        void appendInConstructor(const QString& command);
         void append(const QString& command);
         QString up(const QString& current);
         QString down(const QString& current);
+        int getHistoryLength(){
+            return this->_history.length();
+        }
+        void saveCommandHistory(const QString &fileName);
     private:
         static constexpr int maxHistoryLength = 100;
         QList<QString> _history;
         int _index = 0;
+        bool           _isUpdatedCommand = false;
     };
 
     int           _cursor_home_pos;

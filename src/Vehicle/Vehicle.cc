@@ -1975,6 +1975,10 @@ void Vehicle::_sendMessageOnLink(LinkInterface* link, mavlink_message_t message)
 
 void Vehicle::_updatePriorityLink(bool updateActive, bool sendCommand)
 {
+    // Don't allow update
+    if (!this->_allowUpdatePriorityLink){
+        return;
+    }
     emit linksPropertiesChanged();
 
     // if the priority link is commanded and still active don't change anything
