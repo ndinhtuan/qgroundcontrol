@@ -184,5 +184,6 @@
         <file>resources/Test.svg</file>
         <file>resources/drone_main.svg</file>
         <file>resources/fan.svg</file>
+        <file>resources/main_drone.svg</file>
     </qresource>
 </RCC>

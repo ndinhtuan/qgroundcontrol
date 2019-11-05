@@ -83,6 +83,8 @@ Rectangle {
         id:                                 droneIcon
         anchors.horizontalCenter:           parent.horizontalCenter
         anchors.verticalCenter:             parent.verticalCenter
+        readonly property real sin30: 0.5
+        readonly property real cos30: 0.866025404
         TestDroneMainIcon{
             anchors.horizontalCenter:   parent.horizontalCenter
             anchors.verticalCenter:     parent.verticalCenter
@@ -91,8 +93,11 @@ Rectangle {
         TestWingIcon{
             anchors.top:        mainDrone.top
             anchors.left:       mainDrone.left
-            anchors.margins:    -_margin
+//            anchors.margins:    -_margin
+            anchors.leftMargin: mainDrone.width / 2 - wing1.width / 2
+            anchors.topMargin: -wing1.height / 2 + mainDrone.height / 22
             id:                 wing1
+            textIdWing: "1"
             onClicked: {
                 console.log("Menu Test:........... wing 1: clicked!!!")
                 console.log("Menu Test:........... wing 1: running: ", running)
@@ -107,9 +112,12 @@ Rectangle {
         }
         TestWingIcon{
             anchors.top:            mainDrone.top
-            anchors.right:          mainDrone.right
-            anchors.margins:        -_margin
+            anchors.left:          mainDrone.left
+//            anchors.margins:        -_margin
+            anchors.leftMargin: (mainDrone.width/2) * droneIcon.cos30 + mainDrone.width/2 - mainDrone.width/24 - wing2.width/2
+            anchors.topMargin: mainDrone.height/2 - (mainDrone.height/2) * droneIcon.sin30 - wing2.height/2 + mainDrone.height/44
             id:                     wing2
+            textIdWing: "2"
             onClicked: {
                 console.log("Menu Test:........... wing 2: clicked!!!")
                 console.log("Menu Test:........... wing 2: running: ", running)
@@ -124,10 +132,13 @@ Rectangle {
             }
         }
         TestWingIcon{
-            anchors.bottom:     mainDrone.bottom
+            anchors.top:     mainDrone.top
             anchors.left:       mainDrone.left
-            anchors.margins:    -_margin
+//            anchors.margins:    -_margin
+            anchors.leftMargin: (mainDrone.width/2) * droneIcon.cos30 + mainDrone.width/2 - mainDrone.width/24 - wing3.width/2
+            anchors.topMargin: mainDrone.height/2 + (mainDrone.height/2) * droneIcon.sin30 - wing3.height/2 - mainDrone.height/44
             id:                 wing3
+            textIdWing: "3"
             onClicked: {
                 console.log("Menu Test:........... wing 3: clicked!!!")
                 console.log("Menu Test:........... wing 3: running: ", running)
@@ -141,16 +152,60 @@ Rectangle {
             }
         }
         TestWingIcon{
-            anchors.bottom:         mainDrone.bottom
-            anchors.right:          mainDrone.right
-            anchors.margins:        -_margin
+            anchors.top:         mainDrone.top
+            anchors.left:         mainDrone.left
+//            anchors.margins:        -_margin
+            anchors.leftMargin: mainDrone.width / 2 - wing3.width / 2
+            anchors.topMargin: -wing3.height / 2 - mainDrone.height / 22 + mainDrone.height
             id:                     wing4
+            textIdWing: "4"
             onClicked: {
                 console.log("Menu Test:........... wing 4: clicked!!!")
                 console.log("Menu Test:........... wing 4: running: ", running)
 
                 if(running){
                     conController.sendCommand("pwm test -c 4 -p " + _speedSlider.getSpeedValue())
+                }
+                else{
+                    conController.sendCommand("c")
+                }
+            }
+        }
+        TestWingIcon{
+            anchors.top:            mainDrone.top
+            anchors.left:          mainDrone.left
+//            anchors.margins:        -_margin
+            anchors.leftMargin: mainDrone.width/2 - (mainDrone.width/2) * droneIcon.cos30 + mainDrone.width/24 - wing5.width/2
+            anchors.topMargin: mainDrone.height/2 - (mainDrone.height/2) * droneIcon.sin30 - wing5.height/2 + mainDrone.height/44
+            id:                     wing5
+            textIdWing: "5"
+            onClicked: {
+                console.log("Menu Test:........... wing 5: clicked!!!")
+                console.log("Menu Test:........... wing 5: running: ", running)
+
+                if(running){
+                    conController.sendCommand("pwm test -c 5 -p " + _speedSlider.getSpeedValue())
+                    console.log("pwm test -c 5 -p " + _speedSlider.getSpeedValue())
+                }
+                else{
+                    conController.sendCommand("c")
+                }
+            }
+        }
+        TestWingIcon{
+            anchors.top:     mainDrone.top
+            anchors.left:       mainDrone.left
+//            anchors.margins:    -_margin
+            anchors.leftMargin: -(mainDrone.width/2) * droneIcon.cos30 + mainDrone.width/2 + mainDrone.width/24 - wing6.width/2
+            anchors.topMargin: mainDrone.height/2 + (mainDrone.height/2) * droneIcon.sin30 - wing6.height/2 - mainDrone.height/44
+            id:                 wing6
+            textIdWing: "6"
+            onClicked: {
+                console.log("Menu Test:........... wing 6: clicked!!!")
+                console.log("Menu Test:........... wing 6: running: ", running)
+
+                if(running){
+                    conController.sendCommand("pwm test -c 6 -p " + _speedSlider.getSpeedValue())
                 }
                 else{
                     conController.sendCommand("c")

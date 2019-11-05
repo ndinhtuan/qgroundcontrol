@@ -22,13 +22,18 @@ Button {
     autoExclusive:      true
     state:              "stop"
     readonly property int _margin: button.width / 4.2
+    property string textIdWing
     property bool running: false
     background: Rectangle {
         anchors.fill: parent
         //        color:  logo ? qgcPal.brandingPurple : (checked ? qgcPal.buttonHighlight : Qt.rgba(0,0,0,0))
         color:  checked ? qgcPal.buttonHighlight : Qt.rgba(0,0,0,0)
     }
-
+    Text {
+        id: idWing
+        text: textIdWing
+        color: "white"
+    }
     QGCColoredImage {
         anchors.centerIn:       parent
         id:                     _icon
@@ -47,13 +52,13 @@ Button {
             name: "stop"
             when: running == false
             PropertyChanges {
-                target: button
+                target: _icon
             }
         },
         State {
             name: "running"
             when: running == true
-            PropertyChanges { target: button; rotation: 360 }
+            PropertyChanges { target: _icon; rotation: 360 }
         }
     ]
     transitions: Transition {

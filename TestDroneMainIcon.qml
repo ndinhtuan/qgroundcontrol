@@ -30,7 +30,7 @@ Item {
         fillMode:               Image.PreserveAspectFit
         //            color:                  logo ? "white" : (button.checked ? qgcPal.buttonHighlightText : qgcPal.buttonText)
         color:                  button.checked ? qgcPal.buttonHighlightText : qgcPal.buttonText
-        source:                 "/qmlimages/resources/drone_main.svg"
+        source:                 "/qmlimages/resources/main_drone.svg"
     }
 
 }
