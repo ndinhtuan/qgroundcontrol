@@ -54,6 +54,22 @@ Rectangle {
                 text:               qsTr("Manual Test")
                 exclusiveGroup:     panelActionGroup
                 Layout.fillWidth:   true
+                onClicked: {
+//                    console.log("basic demo")
+                    __rightPanel.source = "qrc:/qml/ManualTesting.qml"
+                }
+
+            }
+
+            QGCButton {
+                height:             _buttonHeight
+                text:               qsTr("Basic demo")
+                exclusiveGroup:     panelActionGroup
+                Layout.fillWidth:   true
+                onClicked: {
+//                    console.log("basic demo")
+                    __rightPanel.source = "qrc:/qml/ManualTesting.qml"
+                }
 
             }
 

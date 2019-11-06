@@ -23,6 +23,9 @@ Slider {
     property bool zeroCentered: false
     property bool displayValue: false
 
+
+
+
     style: SliderStyle {
         groove: Item {
             anchors.verticalCenter: parent.verticalCenter

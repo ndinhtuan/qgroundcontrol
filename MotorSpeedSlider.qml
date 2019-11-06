@@ -8,6 +8,7 @@ import QGroundControl.ScreenTools   1.0
 
 Rectangle {
     id: _root
+    property QGCSlider qgcSlider: altSlider
 
     Column {
         id:     headerColumn
@@ -21,7 +22,7 @@ Rectangle {
             anchors.right:          parent.right
             wrapMode:               Text.WordWrap
             horizontalAlignment:    Text.AlignHCenter
-            text:                   qsTr("New Alt(rel)")
+            text:                   qsTr("New Speed")
         }
     }
 
@@ -47,6 +48,14 @@ Rectangle {
             origin.x:   altSlider.width  / 2
             origin.y:   altSlider.height / 2
             angle:      180
+        }
+
+        onValueChanged : {
+            if (motorID != 0){
+                conController.sendCommand("c")
+                conController.sendCommand("pwm test -c " + motorID + " -p " + _speedSlider.getSpeedValue())
+                console.log("pwm test -c " + motorID + " -p " + _speedSlider.getSpeedValue())
+            }
         }
     }
 }

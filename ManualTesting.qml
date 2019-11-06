@@ -34,6 +34,7 @@ Rectangle {
     property real   _pipSize:                       mainWindow.width * 0.2
     property alias  _guidedController:              guidedActionsController
     property alias _speedSlider: speedSlider
+    property int motorID: 0
 
     readonly property var       _dynamicCameras:        activeVehicle ? activeVehicle.dynamicCameras : null
     readonly property bool      _isCamera:              _dynamicCameras ? _dynamicCameras.cameras.count > 0 : false
@@ -103,10 +104,12 @@ Rectangle {
                 console.log("Menu Test:........... wing 1: running: ", running)
 
                 if(running){
-                    conController.sendCommand("pwm test -c 1 -p " + _speedSlider.getSpeedValue())
+                    //conController.sendCommand("pwm test -c 1 -p " + _speedSlider.getSpeedValue())
+                    motorID = 1
                 }
                 else{
-                    conController.sendCommand("c")
+                    //conController.sendCommand("c")
+                    motorID = 0
                 }
             }            
         }
@@ -123,11 +126,13 @@ Rectangle {
                 console.log("Menu Test:........... wing 2: running: ", running)
 
                 if(running){
-                    conController.sendCommand("pwm test -c 2 -p " + _speedSlider.getSpeedValue())
-                    console.log("pwm test -c 2 -p " + _speedSlider.getSpeedValue())
+//                    conController.sendCommand("pwm test -c 2 -p " + _speedSlider.getSpeedValue())
+//                    console.log("pwm test -c 2 -p " + _speedSlider.getSpeedValue())
+                    motorID = 2
                 }
                 else{
-                    conController.sendCommand("c")
+                    //conController.sendCommand("c")
+                    motorID = 0
                 }
             }
         }
@@ -144,10 +149,12 @@ Rectangle {
                 console.log("Menu Test:........... wing 3: running: ", running)
 
                 if(running){
-                    conController.sendCommand("pwm test -c 3 -p " + _speedSlider.getSpeedValue())
+                    //conController.sendCommand("pwm test -c 3 -p " + _speedSlider.getSpeedValue())
+                    motorID = 3
                 }
                 else{
-                    conController.sendCommand("c")
+                    //conController.sendCommand("c")
+                    motorID = 0
                 }
             }
         }
@@ -164,10 +171,12 @@ Rectangle {
                 console.log("Menu Test:........... wing 4: running: ", running)
 
                 if(running){
-                    conController.sendCommand("pwm test -c 4 -p " + _speedSlider.getSpeedValue())
+                    //conController.sendCommand("pwm test -c 4 -p " + _speedSlider.getSpeedValue())
+                    motorID = 4
                 }
                 else{
-                    conController.sendCommand("c")
+                    //conController.sendCommand("c")
+                    motorID = 0
                 }
             }
         }
@@ -184,11 +193,12 @@ Rectangle {
                 console.log("Menu Test:........... wing 5: running: ", running)
 
                 if(running){
-                    conController.sendCommand("pwm test -c 5 -p " + _speedSlider.getSpeedValue())
-                    console.log("pwm test -c 5 -p " + _speedSlider.getSpeedValue())
+//                    conController.sendCommand("pwm test -c 5 -p " + _speedSlider.getSpeedValue())
+//                    console.log("pwm test -c 5 -p " + _speedSlider.getSpeedValue())
+                    motorID = 5
                 }
                 else{
-                    conController.sendCommand("c")
+                    motorID = 0
                 }
             }
         }
@@ -205,10 +215,12 @@ Rectangle {
                 console.log("Menu Test:........... wing 6: running: ", running)
 
                 if(running){
-                    conController.sendCommand("pwm test -c 6 -p " + _speedSlider.getSpeedValue())
+                    //conController.sendCommand("pwm test -c 6 -p " + _speedSlider.getSpeedValue())
+                    motorID = 6
                 }
                 else{
-                    conController.sendCommand("c")
+                    //conController.sendCommand("c")
+                    motorID = 0
                 }
             }
         }
