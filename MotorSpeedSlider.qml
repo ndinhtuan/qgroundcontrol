@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import QtQuick.Controls 1.2
+import QtQuick.Layouts 1.2
 
 import QGroundControl   1.0
 import QGroundControl.Controls   1.0
@@ -9,6 +10,7 @@ import QGroundControl.ScreenTools   1.0
 Rectangle {
     id: _root
     property QGCSlider qgcSlider: altSlider
+    property bool isStart: false
 
     Column {
         id:     headerColumn
@@ -18,11 +20,57 @@ Rectangle {
         anchors.right:  parent.right
 
         QGCLabel {
+            id  : status
             anchors.left:           parent.left
             anchors.right:          parent.right
             wrapMode:               Text.WordWrap
             horizontalAlignment:    Text.AlignHCenter
-            text:                   qsTr("New Speed")
+            text:                   "Stop"
+        }
+
+        GridLayout {
+            columns: 2
+            columnSpacing: 6
+            anchors.right: parent.right
+
+            QGCButton {
+                height:             _buttonHeight
+                text:               qsTr("Start")
+
+                Layout.fillWidth:   true
+                onClicked: {
+                    if(isStart){
+                        return
+                    }
+
+                    doRotatingMotors()
+                    isStart = true
+                    status.text = "Start"
+                }
+            }
+            QGCButton {
+                height:             _buttonHeight
+                text:               qsTr("Stop")
+                Layout.fillWidth:   true
+                onClicked: {
+//                    if(!isStart){
+//                        return
+//                    }
+
+                    isStart = false
+                    resetRotatingMotors()
+                    status.text = "Stop"
+                }
+            }
+        }
+
+        QGCLabel {
+            id: textSlider
+            anchors.left:           parent.left
+            anchors.right:          parent.right
+            wrapMode:               Text.WordWrap
+            horizontalAlignment:    Text.AlignHCenter
+            text:                   "Speed " +_speedSlider.getSpeedValue()
         }
     }
 
@@ -51,11 +99,12 @@ Rectangle {
         }
 
         onValueChanged : {
-            if (motorID != 0){
-                conController.sendCommand("c")
-                conController.sendCommand("pwm test -c " + motorID + " -p " + _speedSlider.getSpeedValue())
-                console.log("pwm test -c " + motorID + " -p " + _speedSlider.getSpeedValue())
+
+            textSlider.text = "Speed " + _speedSlider.getSpeedValue()
+            if(!isStart){
+                return
             }
+            doRotatingMotors()
         }
     }
 }

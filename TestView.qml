@@ -68,7 +68,7 @@ Rectangle {
                 Layout.fillWidth:   true
                 onClicked: {
 //                    console.log("basic demo")
-                    __rightPanel.source = "qrc:/qml/ManualTesting.qml"
+                    __rightPanel.source = "qrc:/qml/BasicDemo.qml"
                 }
 
             }

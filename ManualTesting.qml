@@ -48,7 +48,42 @@ Rectangle {
     readonly property string    _showMapBackgroundKey:  "/showMapBackground"
     readonly property string    _mainIsMapKey:          "MainFlyWindowIsMap"
     readonly property string    _PIPVisibleKey:         "IsPIPVisible"
+    property var motorIDs : [false, false, false, false, false, false]
 
+    function getRotatingMotors(){
+        var s = ""
+        for(var i = 0; i < motorIDs.length; i++){
+            if(motorIDs[i]){
+                s += i + 1
+            }
+        }
+
+        return s
+    }
+
+    function resetRotatingMotors(){
+        motorIDs = [false, false, false, false, false, false]
+        wing1.running = false
+        wing2.running = false
+        wing3.running = false
+        wing4.running = false
+        wing5.running = false
+        wing6.running = false
+        conController.sendCommand("c")
+    }
+
+    function doRotatingMotors(){
+        var s = getRotatingMotors()
+
+        if(s === "") {
+            conController.sendCommand("c")
+            return
+        }
+
+        conController.sendCommand("c")
+        conController.sendCommand("pwm test -c " + s + " -p " + _speedSlider.getSpeedValue())
+        console.log("pwm test -c " + s + " -p " + _speedSlider.getSpeedValue())
+    }
 
 //    Row{
 //        id:                 buttonRow
@@ -100,16 +135,24 @@ Rectangle {
             id:                 wing1
             textIdWing: "1"
             onClicked: {
+
+                if (speedSlider.isStart){
+                    return
+                }
+
+                running = !running
                 console.log("Menu Test:........... wing 1: clicked!!!")
                 console.log("Menu Test:........... wing 1: running: ", running)
 
                 if(running){
-                    //conController.sendCommand("pwm test -c 1 -p " + _speedSlider.getSpeedValue())
-                    motorID = 1
+                    //conController.sendCommand("pwm test -c " + rotatingMotor + " -p " + _speedSlider.getSpeedValue())
+                    //motorID = 1
+                    motorIDs[0] = true
                 }
                 else{
                     //conController.sendCommand("c")
-                    motorID = 0
+                    //motorID = 0
+                    motorIDs[0] = false
                 }
             }            
         }
@@ -122,17 +165,27 @@ Rectangle {
             id:                     wing2
             textIdWing: "2"
             onClicked: {
+
+                if (speedSlider.isStart){
+                    return
+                }
+
+                running = !running
+
                 console.log("Menu Test:........... wing 2: clicked!!!")
                 console.log("Menu Test:........... wing 2: running: ", running)
 
+
                 if(running){
-//                    conController.sendCommand("pwm test -c 2 -p " + _speedSlider.getSpeedValue())
+                   //conController.sendCommand("pwm test -c 2 -p " + _speedSlider.getSpeedValue())
 //                    console.log("pwm test -c 2 -p " + _speedSlider.getSpeedValue())
-                    motorID = 2
+                    //motorID = 2
+                    motorIDs[1] = true
                 }
                 else{
-                    //conController.sendCommand("c")
-                    motorID = 0
+                    conController.sendCommand("c")
+                    //motorID = 0
+                    motorIDs[1] = false
                 }
             }
         }
@@ -145,16 +198,24 @@ Rectangle {
             id:                 wing3
             textIdWing: "3"
             onClicked: {
+
+                if (speedSlider.isStart){
+                    return
+                }
+
+                running = !running
                 console.log("Menu Test:........... wing 3: clicked!!!")
                 console.log("Menu Test:........... wing 3: running: ", running)
 
                 if(running){
                     //conController.sendCommand("pwm test -c 3 -p " + _speedSlider.getSpeedValue())
-                    motorID = 3
+                    //motorID = 3
+                    motorIDs[2] = true
                 }
                 else{
                     //conController.sendCommand("c")
-                    motorID = 0
+                    //motorID = 0
+                    motorIDs[2] = false
                 }
             }
         }
@@ -167,16 +228,25 @@ Rectangle {
             id:                     wing4
             textIdWing: "4"
             onClicked: {
+
+                if (speedSlider.isStart){
+                    return
+                }
+
+                running = !running
+
                 console.log("Menu Test:........... wing 4: clicked!!!")
                 console.log("Menu Test:........... wing 4: running: ", running)
 
                 if(running){
                     //conController.sendCommand("pwm test -c 4 -p " + _speedSlider.getSpeedValue())
-                    motorID = 4
+                    //motorID = 4
+                    motorIDs[3] = true
                 }
                 else{
                     //conController.sendCommand("c")
-                    motorID = 0
+                    //motorID = 0
+                    motorIDs[3] = false
                 }
             }
         }
@@ -189,16 +259,27 @@ Rectangle {
             id:                     wing5
             textIdWing: "5"
             onClicked: {
+
+                if (speedSlider.isStart){
+                    return
+                }
+
+                running = !running
+
                 console.log("Menu Test:........... wing 5: clicked!!!")
                 console.log("Menu Test:........... wing 5: running: ", running)
 
                 if(running){
-//                    conController.sendCommand("pwm test -c 5 -p " + _speedSlider.getSpeedValue())
+                    //conController.sendCommand("pwm test -c 5 -p " + _speedSlider.getSpeedValue())
 //                    console.log("pwm test -c 5 -p " + _speedSlider.getSpeedValue())
-                    motorID = 5
+                    //motorID = 5
+                    motorIDs[4] = true
                 }
                 else{
-                    motorID = 0
+
+                    //conController.sendCommand("c")
+                    //motorID = 0
+                    motorIDs[4] = false
                 }
             }
         }
@@ -211,16 +292,25 @@ Rectangle {
             id:                 wing6
             textIdWing: "6"
             onClicked: {
+
+                if (speedSlider.isStart){
+                    return
+                }
+
+                running = !running
+
                 console.log("Menu Test:........... wing 6: clicked!!!")
                 console.log("Menu Test:........... wing 6: running: ", running)
 
                 if(running){
                     //conController.sendCommand("pwm test -c 6 -p " + _speedSlider.getSpeedValue())
-                    motorID = 6
+                    //motorID = 6
+                    motorIDs[5] = true
                 }
                 else{
                     //conController.sendCommand("c")
-                    motorID = 0
+                    //motorID = 0
+                    motorIDs[5] = false
                 }
             }
         }

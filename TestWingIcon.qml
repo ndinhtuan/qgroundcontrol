@@ -72,7 +72,7 @@ Button {
             }
         }
     }
-    onClicked: {
-        running = !running
-    }
+//    onClicked: {
+//        running = !running
+//    }
 }
