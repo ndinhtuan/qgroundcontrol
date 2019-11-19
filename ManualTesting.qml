@@ -49,6 +49,9 @@ Rectangle {
     readonly property string    _mainIsMapKey:          "MainFlyWindowIsMap"
     readonly property string    _PIPVisibleKey:         "IsPIPVisible"
     property var motorIDs : [false, false, false, false, false, false]
+    property int oldSliderValue: 0
+    property int threshChangeSliderValue: 40
+    property bool firstDoingRotating: true
 
     function getRotatingMotors(){
         var s = ""
@@ -70,6 +73,7 @@ Rectangle {
         wing5.running = false
         wing6.running = false
         conController.sendCommand("c")
+        firstDoingRotating = true
     }
 
     function doRotatingMotors(){
@@ -77,12 +81,24 @@ Rectangle {
 
         if(s === "") {
             conController.sendCommand("c")
+            console.log("Only send 'c' command")
             return
         }
 
+        var currentSpeedSlider = _speedSlider.getSpeedValue()
+        if (!firstDoingRotating && Math.abs(currentSpeedSlider - oldSliderValue) < threshChangeSliderValue){
+
+            return
+        }
+        if (firstDoingRotating){
+            firstDoingRotating = false;
+        }
+
+        oldSliderValue = currentSpeedSlider
+
         conController.sendCommand("c")
-        conController.sendCommand("pwm test -c " + s + " -p " + _speedSlider.getSpeedValue())
-        console.log("pwm test -c " + s + " -p " + _speedSlider.getSpeedValue())
+        conController.sendCommand("pwm test -c " + s + " -p " + currentSpeedSlider)
+        console.log("pwm test -c " + s + " -p " + currentSpeedSlider)
     }
 
 //    Row{
