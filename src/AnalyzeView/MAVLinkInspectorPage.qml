@@ -40,6 +40,7 @@ Item {
         text:               qsTr("Inspect real time MAVLink messages.")
         anchors.top:        parent.top
         anchors.left:       parent.left
+
     }
 
     //-- Messages (Buttons)

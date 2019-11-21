@@ -1,6 +1,7 @@
 import QtQuick          2.3
 import QtQuick.Controls 1.2
 import QtQuick.Dialogs  1.2
+import QtQuick.Layouts 1.2
 
 import QGroundControl               1.0
 import QGroundControl.Airspace      1.0
@@ -49,8 +50,9 @@ Rectangle {
     readonly property string    _mainIsMapKey:          "MainFlyWindowIsMap"
     readonly property string    _PIPVisibleKey:         "IsPIPVisible"
     property var motorIDs : [false, false, false, false, false, false]
+    property var threshMeasurings: [1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900]
     property int oldSliderValue: 0
-    property int threshChangeSliderValue: 40
+    property int threshChangeSliderValue: 30
     property bool firstDoingRotating: true
 
     function getRotatingMotors(){
@@ -380,5 +382,72 @@ Rectangle {
         width:              ScreenTools.defaultFontPixelWidth * 10
         color:              qgcPal.window
         visible:            true
+    }
+
+    // InformationDrone
+    InformationDrone{
+        id:     inforDrone
+        anchors.top:    parent.top
+        anchors.left: parent.left
+        height: 250
+    }
+
+    // Measuring threshold threst for motor
+    Text{
+        text: "Measuring: "
+        anchors.bottom: threshMeasuringValues.top
+        anchors.left: threshMeasuringValues.left
+        color: "#7fff00"
+        font.pointSize: 20
+    }
+
+    RowLayout{
+        focus: true
+        id: threshMeasuringValues
+        anchors.left: parent.left
+        anchors.bottom: parent.bottom
+
+        TextEdit {
+            id: motorText
+//            activeFocusOnPress: true
+            property string placeholderText: "Enter motor ID here..."
+            width: 100
+            height: 50
+            color: "#fff"
+
+            Text {
+                 text: motorText.placeholderText
+                 color: "#fff"
+                 visible: !motorText.text
+            }
+        }
+
+        Repeater{
+            focus: true
+            model: 10
+
+            delegate:
+                ColumnLayout{
+                    focus: true
+                    TextEdit{
+//                        activeFocusOnPress: true
+                        focus: true
+                        Text {
+                             text: threshMeasurings[index]
+                             color: "#fff"
+                             visible: !parent.text
+                        }
+                    }
+
+                    Button{
+                        text: threshMeasurings[index]
+                        onClicked: {
+//                            var tmp = valueMotor.text?valueMotor.text: threshMeasurings[index]
+                            conController.sendCommand("pwm test -c " + motorText.text + " -p " + threshMeasurings[index])
+                            console.log("pwm test -c " + motorText.text + " -p " + threshMeasurings[index])
+                        }
+                    }
+                }
+        }
     }
 }

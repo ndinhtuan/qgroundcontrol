@@ -74,8 +74,9 @@ Rectangle {
         }
     }
 
-    function getSpeedValue(){
-        return 1000 + Math.round(1000*altSlider.value)
+    function getSpeedValue(){ //[1000, 1500]
+        return 1000 + Math.round(500*altSlider.value)
+//        return Math.round(altSlider.value)
     }
 
     QGCSlider {
@@ -98,10 +99,14 @@ Rectangle {
             angle:      180
         }
 
-        onValueChanged : {
+        onValueChanged:{
+            textSlider.text = "Speed " + _speedSlider.getSpeedValue()
+        }
+
+        onPressedChanged : {
 
             textSlider.text = "Speed " + _speedSlider.getSpeedValue()
-            if(!isStart){
+            if(!isStart || pressed){
                 return
             }
             doRotatingMotors()
