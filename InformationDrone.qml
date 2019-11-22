@@ -14,6 +14,11 @@ TableView {
 
     id: parent
 
+    property double pi: 3.14159265358979
+
+    function radToDeg(rad) {
+        return (rad / pi * 180.0);
+    }
 
     MAVLinkInspectorController {
         id: controller
@@ -37,8 +42,8 @@ TableView {
     ListModel {
         id: infoModel
         property var curVehicle:        controller ? controller.activeVehicle : null
-        property var messageAttitude:        curVehicle && curVehicle.messages.count ? curVehicle.messages.get(5) : null
-        property var messageServoOutput:        curVehicle && curVehicle.messages.count ? curVehicle.messages.get(7) : null
+        property var messageAttitude:        curVehicle && curVehicle.messages.count ? getMessageWithID(curVehicle.messages, 30) : null
+        property var messageServoOutput:        curVehicle && curVehicle.messages.count ? getMessageWithID(curVehicle.messages, 36) : null
 
         property real roll: messageAttitude ? messageAttitude.fields.get(1).value: null
         property real pitch: messageAttitude ? messageAttitude.fields.get(2).value: null
@@ -54,6 +59,20 @@ TableView {
         property bool ready: curVehicle & messageAttitude & messageServoOutput
 
         property bool completed: false
+
+        function getMessageWithID(messages, id){
+
+            console.log("Count messages: ", messages.count)
+            for (var i = 0; i < messages.count; i++){
+                var curMess = messages.get(i);
+
+                if (curMess.id === id){
+                    return curMess;
+                }
+            }
+
+            return null;
+        }
 
         Component.onCompleted: {
             append({"info": "Roll", value: 0});
@@ -71,13 +90,13 @@ TableView {
         }
 
         onRollChanged: {
-            setProperty(0, "value", roll);
+            setProperty(0, "value", radToDeg(roll));
         }
         onPitchChanged: {
-            setProperty(1, "value", pitch)
+            setProperty(1, "value", radToDeg(pitch))
         }
         onYawChanged: {
-            setProperty(2, "value", yaw)
+            setProperty(2, "value", radToDeg(yaw))
         }
 
         onPwm1Changed: {
