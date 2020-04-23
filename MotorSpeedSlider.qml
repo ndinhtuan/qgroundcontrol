@@ -75,7 +75,7 @@ Rectangle {
     }
 
     function getSpeedValue(){ //[1000, 1500]
-        return 1000 + Math.round(500*altSlider.value)
+        return 1000 + Math.round(900*altSlider.value)
 //        return Math.round(altSlider.value)
     }
 
