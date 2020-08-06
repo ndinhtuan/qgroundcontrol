@@ -51,6 +51,8 @@
         <file>resources/icons/qgroundcontrol.ico</file>
         <file>resources/icons/uet.ico</file>
         <file>resources/uet.svg</file>
+        <file>resources/meiko.svg</file>
+        <file>resources/icons/meiko.ico</file>
     </qresource>
     <qresource prefix="/res/firmware">
         <file alias="3drradio.png">resources/firmware/3drradio.png</file>

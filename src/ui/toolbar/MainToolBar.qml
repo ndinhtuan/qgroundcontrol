@@ -68,8 +68,8 @@ Item {
                 anchors.top:        parent.top
                 anchors.bottom:     parent.bottom
 //                icon.source:        "/res/QGCLogoWhite"
-                icon.source:        "/res/resources/uet.svg"
-                logo:               true
+                icon.source:        "/res/resources/meiko.svg"
+//                logo:               true
                 visible:            !QGroundControl.corePlugin.options.combineSettingsAndSetup
                 onClicked: {
                     checked = true
@@ -207,3 +207,8 @@ Item {
         }
     }
 }
+
+/*##^## Designer {
+    D{i:0;autoSize:true;height:480;width:640}
+}
+ ##^##*/
