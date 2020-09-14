@@ -1,3 +1,4 @@
+
 cmake_minimum_required(VERSION 3.2)
 
 project(QGroundControl LANGUAGES C CXX)
@@ -64,7 +65,7 @@ endif()
 
 #=============================================================================
 # GStreamer
-#
+
 find_package(PkgConfig)
 pkg_check_modules(GST
     gstreamer-1.0>=1.14

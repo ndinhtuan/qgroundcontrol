@@ -15,6 +15,7 @@
 # Setup our supported build types. We do this once here and then use the defined config scopes
 # to allow us to easily modify suported build types in one place instead of duplicated throughout
 # the project file.
+me
 
 linux {
     linux-g++ | linux-g++-64 | linux-g++-32 | linux-clang {
@@ -28,7 +29,7 @@ linux {
             message("Linux clang")
             QMAKE_CXXFLAGS += -Qunused-arguments -fcolor-diagnostics
         }
-    } else : linux-rasp-pi2-g++ {
+    } else : linux-rasp-pi3-g++ {
         message("Linux R-Pi2 build")
         CONFIG += LinuxBuild
         DEFINES += __STDC_LIMIT_MACROS __rasp_pi2__
@@ -60,7 +61,12 @@ linux {
             error("Unsupported Android architecture: $${ANDROID_TARGET_ARCH}")
         }
     } else {
-        error("Unsuported Linux toolchain, only GCC 32- or 64-bit is supported")
+	message("Linux R-Pi2 build")
+        CONFIG += LinuxBuild
+        DEFINES += __STDC_LIMIT_MACROS __rasp_pi2__
+        DEFINES += QGC_GST_TAISYNC_ENABLED
+        DEFINES += QGC_GST_MICROHARD_ENABLED 
+        #error("Unsuported Linux toolchain, only GCC 32- or 64-bit is supported")
     }
 } else : win32 {
     win32-msvc2015 {

@@ -7,6 +7,7 @@
 # License terms set in COPYING.md
 # -------------------------------------------------
 
+
 QMAKE_PROJECT_DEPTH = 0 # undocumented qmake flag to force absolute paths in make files
 
 exists($${OUT_PWD}/qgroundcontrol.pro) {
@@ -19,12 +20,12 @@ message(Qt version $$[QT_VERSION])
     error("Unsupported Qt version, 5.11+ is required")
 }
 
+
 include(QGCCommon.pri)
 
 TARGET   = QGroundControl
 TEMPLATE = app
 QGCROOT  = $$PWD
-
 DebugBuild {
     DESTDIR  = $${OUT_PWD}/debug
 } else {
@@ -241,7 +242,6 @@ DebugBuild {
 } else {
     CONFIG += qtquickcompiler
 }
-
 contains(DEFINES, ENABLE_VERBOSE_OUTPUT) {
     message("Enable verbose compiler output (manual override from command line)")
 } else:exists(user_config.pri):infile(user_config.pri, DEFINES, ENABLE_VERBOSE_OUTPUT) {
@@ -249,7 +249,6 @@ contains(DEFINES, ENABLE_VERBOSE_OUTPUT) {
 } else {
     CONFIG += silent
 }
-
 QT += \
     concurrent \
     gui \
@@ -1388,7 +1387,6 @@ contains (CONFIG, QGC_DISABLE_BUILD_SETUP) {
 #
 # Installer targets
 #
-
 contains (CONFIG, QGC_DISABLE_INSTALLER_SETUP) {
     message("Disable standard installer setup")
 } else {

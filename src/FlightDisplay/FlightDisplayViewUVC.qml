@@ -11,6 +11,16 @@ import QtQuick                  2.3
 import QtMultimedia             5.5
 
 import QGroundControl           1.0
+import QtQuick.Dialogs  1.2
+import QtQuick.Layouts  1.2
+
+
+import QGroundControl.Controls      1.0
+import QGroundControl.ScreenTools   1.0
+import QGroundControl.FactSystem    1.0
+import QGroundControl.FactControls  1.0
+import QGroundControl.Controllers   1.0
+import QGroundControl.Palette       1.0
 
 Rectangle {
     id:                 _root
@@ -29,6 +39,46 @@ Rectangle {
             _root.height = parent.height * ar
         }
     }
+//    Item {
+//        width: 320
+//        height: 510
+//        Camera {
+//            id: camera
+//            imageCapture {
+//                onImageCaptured: {
+//                    // Show the preview in an Image
+//                    photoPreview.source = preview
+//                }
+//                onImageSaved: {
+//                    text.text = qsTr("Last Captured Image (%1):").arg(camera.imageCapture.capturedImagePath)
+//                }
+//            }
+//        }
+//        Column {
+//            Text {
+//                height: 15
+//                text: qsTr("Preview (Click to capture):")
+//            }
+//            VideoOutput {
+//                source: camera
+//                focus: visible // To receive focus and capture key events when visible
+//                width: 320; height: 240
+//                MouseArea {
+//                    anchors.fill: parent
+//                    onClicked: camera.imageCapture.capture()
+//                }
+//            }
+//            Text {
+//                id: text
+//                height: 15
+//                text: qsTr("Last Captured Image (none)")
+//            }
+//            Image {
+//                id: photoPreview
+//                width: 320; height: 240
+//            }
+//        }
+//    }
 
     Camera {
         id:             camera
@@ -54,5 +104,23 @@ Rectangle {
             camera.start()
         else
             camera.stop()
+    }
+    QGCColoredImage {
+        anchors.top:                parent.top
+        anchors.bottom:             parent.bottom
+        anchors.horizontalCenter:   parent.horizontalCenter
+        width:                      height * 0.625
+        sourceSize.width:           width
+        source:                     "/qmlimages/CameraIcon.svg"
+        visible:                    recordBtnBackground.visible
+        fillMode:                   Image.PreserveAspectFit
+        color:                      "white"
+    }
+    MouseArea {
+        anchors.fill:   parent
+        enabled:        true
+        onClicked: {
+                camera.imageCapture.capture()
+        }
     }
 }

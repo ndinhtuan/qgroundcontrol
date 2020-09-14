@@ -8,7 +8,9 @@
 # -------------------------------------------------
 
 installer {
+	
     DEFINES += QGC_INSTALL_RELEASE
+
     MacBuild {
         VideoEnabled {
             # Install the gstreamer framework

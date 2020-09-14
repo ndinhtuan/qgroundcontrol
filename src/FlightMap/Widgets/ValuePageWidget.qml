@@ -10,6 +10,8 @@
 import QtQuick          2.3
 import QtQuick.Dialogs  1.2
 import QtQuick.Layouts  1.2
+import QtMultimedia     5.5
+
 
 import QGroundControl.Controls      1.0
 import QGroundControl.ScreenTools   1.0
@@ -18,6 +20,7 @@ import QGroundControl.FactControls  1.0
 import QGroundControl.Controllers   1.0
 import QGroundControl.Palette       1.0
 import QGroundControl               1.0
+
 
 /// Value page for InstrumentPanel PageView
 Column {
@@ -289,6 +292,63 @@ Column {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    //-- Video Recording
+    property bool   _communicationLost:     activeVehicle ? activeVehicle.connectionLost : false
+    property var    _videoReceiver:         QGroundControl.videoManager.videoReceiver
+    property bool   _recordingVideo:        _videoReceiver && _videoReceiver.recording
+    property bool   _videoRunning:          _videoReceiver && _videoReceiver.videoRunning
+    property bool   _streamingEnabled:      QGroundControl.settingsManager.videoSettings.streamConfigured
+    property var    _dynamicCameras:        activeVehicle ? activeVehicle.dynamicCameras : null
+    property int    _curCameraIndex:        _dynamicCameras ? _dynamicCameras.currentCamera : 0
+    property bool   _isCamera:              _dynamicCameras ? _dynamicCameras.cameras.count > 0 : false
+    property var    _camera:                _isCamera ? (_dynamicCameras.cameras.get(_curCameraIndex) && _dynamicCameras.cameras.get(_curCameraIndex).paramComplete ? _dynamicCameras.cameras.get(_curCameraIndex) : null) : null
+
+    QGCLabel {
+       text:            _recordingVideo ? qsTr("Stop Recording") : qsTr("Record Stream")
+       font.pointSize:  ScreenTools.smallFontPointSize
+       visible:         (!_camera || !_camera.autoStream) && QGroundControl.settingsManager.videoSettings.showRecControl.rawValue
+    }
+    // Button to start/stop video recording
+    Item {
+        anchors.margins:    ScreenTools.defaultFontPixelHeight / 2
+        height:             ScreenTools.defaultFontPixelHeight * 2
+        width:              height
+        Layout.alignment:   Qt.AlignHCenter
+        visible:            (!_camera || !_camera.autoStream) && QGroundControl.settingsManager.videoSettings.showRecControl.rawValue
+        Rectangle {
+            id:                 recordBtnBackground
+            anchors.top:        parent.top
+            anchors.bottom:     parent.bottom
+            width:              height
+            radius:             _recordingVideo ? 0 : height
+            color:              "red"
+            SequentialAnimation on opacity {
+                running:        _recordingVideo
+                loops:          Animation.Infinite
+                PropertyAnimation { to: 0.5; duration: 500 }
+                PropertyAnimation { to: 1.0; duration: 500 }
+            }
+        }
+        QGCColoredImage {
+            anchors.top:                parent.top
+            anchors.bottom:             parent.bottom
+            anchors.horizontalCenter:   parent.horizontalCenter
+            width:                      height * 0.625
+            sourceSize.width:           width
+            source:                     "/qmlimages/CameraIcon.svg"
+            visible:                    recordBtnBackground.visible
+            fillMode:                   Image.PreserveAspectFit
+            color:                      "white"
+        }
+        MouseArea {
+            anchors.fill:   parent
+            enabled:        true
+            onClicked: {
+                     QGroundControl.videoManager.uvcEnabled = false ;
             }
         }
     }
