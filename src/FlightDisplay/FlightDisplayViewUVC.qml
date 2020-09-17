@@ -43,9 +43,9 @@ Rectangle {
     property var    rollValue1:  qsTr(_activeVehicle.roll.enumOrValueString + ",")
     property var    pitchValue1:  qsTr( _activeVehicle.pitch.enumOrValueString + ",")
     property var    altValue1:  qsTr( _activeVehicle.altitudeRelative.enumOrValueString + ",")
-    property var    yawValue1:  qsTr( _activeVehicle.heading.enumOrValueString + ",")
+    property var    yawValue1:  qsTr( _activeVehicle.heading.enumOrValueString)
     property var    latGpsValue1:  qsTr( _activeVehicle.gps.lat.enumOrValueString + ",")
-    property var    lonGpsValue1:  qsTr( _activeVehicle.gps.lon.enumOrValueString)
+    property var    lonGpsValue1:  qsTr( _activeVehicle.gps.lon.enumOrValueString, ",")
     property var    textImage1: qsTr("File Name,Lat (decimal degrees),Lon (decimal degrees),Alt (meters MSL),Roll (decimal degrees),Pitch (decimal degrees),Yaw (decimal degrees)")
     property var    dataImage1: latGpsValue1 + lonGpsValue1 + altValue1 + rollValue1 + pitchValue1 + yawValue1
 
@@ -131,9 +131,9 @@ Rectangle {
                  text: dataImage + camera.imageCapture.capturedImagePath
                 }
 
-//    Text {
-//        text: qsTr("Last Captured Image (%1):").arg(camera.imageCapture.capturedImagePath)
-//        }
+    Text {
+        text: qsTr("Last Captured Image (%1):").arg(camera.imageCapture.capturedImagePath)
+        }
     QGCColoredImage {
         anchors.top:                parent.top
         anchors.bottom:             parent.bottom
@@ -149,6 +149,8 @@ Rectangle {
         anchors.fill:   parent
         enabled:        true
         onClicked: {
+
+                camera.sourceSize("1280*720")
                 camera.imageCapture.capture();
                 console.log(camera.imageCapture.capturedImagePath + ","  + dataImage1 )
     }
