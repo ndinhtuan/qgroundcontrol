@@ -1,30 +1,27 @@
 /****************************************************************************
  *
- *   (c) 2009-2016 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
+ * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
  * QGroundControl is licensed according to the terms in the file
  * COPYING.md in the root of the source code directory.
  *
  ****************************************************************************/
 
-
-/**
- * @file
- *   @brief Definition of main class
- *
- *   @author Lorenz Meier <mavteam@student.ethz.ch>
- *
- */
-
-#ifndef QGCAPPLICATION_H
-#define QGCAPPLICATION_H
+#pragma once
 
 #include <QApplication>
 #include <QTimer>
-#include <QQmlApplicationEngine>
+#include <QElapsedTimer>
+#include <QMap>
+#include <QSet>
+#include <QMetaMethod>
+#include <QMetaObject>
+
+// These private headers are require to implement the signal compress support below
+#include <private/qthread_p.h>
+#include <private/qobject_p.h>
 
 #include "LinkConfiguration.h"
-#include "LinkManager.h"
 #include "MAVLinkProtocol.h"
 #include "FlightMapSettings.h"
 #include "FirmwarePluginManager.h"
@@ -40,9 +37,9 @@
 #endif
 
 // Work around circular header includes
+class QQmlApplicationEngine;
 class QGCSingleton;
 class QGCToolbox;
-class QGCFileDownload;
 
 /**
  * @brief The main application and management class.
@@ -50,11 +47,15 @@ class QGCFileDownload;
  * This class is started by the main method and provides
  * the central management unit of the groundstation application.
  *
- **/
-class QGCApplication : public QGuiApplication
+ * Needs QApplication base to support QtCharts module. This way
+ * we avoid application crashing on 5.12 when using the module.
+ *
+ * Note: `lastWindowClosed` will be sent by MessageBox popups and other
+ * dialogs, that are spawned in QML, when they are closed
+**/
+class QGCApplication : public QApplication
 {
     Q_OBJECT
-
 public:
     QGCApplication(int &argc, char* argv[], bool unitTesting);
     ~QGCApplication();
@@ -75,8 +76,11 @@ public:
     /// multiple times.
     void reportMissingParameter(int componentId, const QString& name);
 
-    /// Show a non-modal message to the user
-    void showMessage(const QString& message);
+    /// Show non-modal vehicle message to the user
+    Q_SLOT void showCriticalVehicleMessage(const QString& message);
+
+    /// Show modal application message to the user
+    Q_SLOT void showAppMessage(const QString& message, const QString& title = QString());
 
     /// @return true: Fake ui into showing mobile interface
     bool fakeMobile(void) const { return _fakeMobile; }
@@ -92,11 +96,19 @@ public:
 
     FactGroup* gpsRtkFactGroup(void)  { return _gpsRtkFactGroup; }
 
-    static QString cachedParameterMetaDataFile(void);
-    static QString cachedAirframeMetaDataFile(void);
+    QTranslator& qgcJSONTranslator(void) { return _qgcTranslatorJSON; }
 
     void            setLanguage();
     QQuickItem*     mainRootWindow();
+    uint64_t        msecsSinceBoot(void) { return _msecsElapsedTime.elapsed(); }
+
+    /// Registers the signal such that only the last duplicate signal added is left in the queue.
+    void addCompressedSignal(const QMetaMethod & method);
+
+    void removeCompressedSignal(const QMetaMethod & method);
+
+    static QString cachedParameterMetaDataFile(void);
+    static QString cachedAirframeMetaDataFile(void);
 
 public slots:
     /// You can connect to this slot to show an information message box from a different thread.
@@ -156,52 +168,72 @@ public:
     bool _checkTelemetrySavePath(bool useMessageBox);
 
 private slots:
-    void _missingParamsDisplay(void);
-    void _currentVersionDownloadFinished(QString remoteFile, QString localFile);
-    void _currentVersionDownloadError(QString errorMsg);
-    bool _parseVersionText(const QString& versionString, int& majorVersion, int& minorVersion, int& buildVersion);
-    void _onGPSConnect();
-    void _onGPSDisconnect();
-    void _gpsSurveyInStatus(float duration, float accuracyMM,  double latitude, double longitude, float altitude, bool valid, bool active);
-    void _gpsNumSatellites(int numSatellites);
+    void _missingParamsDisplay                      (void);
+    void _qgcCurrentStableVersionDownloadComplete   (QString remoteFile, QString localFile, QString errorMsg);
+    bool _parseVersionText                          (const QString& versionString, int& majorVersion, int& minorVersion, int& buildVersion);
+    void _onGPSConnect                              (void);
+    void _onGPSDisconnect                           (void);
+    void _gpsSurveyInStatus                         (float duration, float accuracyMM,  double latitude, double longitude, float altitude, bool valid, bool active);
+    void _gpsNumSatellites                          (int numSatellites);
+    void _showDelayedAppMessages                    (void);
 
 private:
     QObject*    _rootQmlObject          ();
     void        _checkForNewVersion     ();
     void        _exitWithError          (QString errorMessage);
 
+    // Overrides from QApplication
+    bool compressEvent(QEvent *event, QObject *receiver, QPostEventList *postedEvents) override;
 
-    bool                _runningUnitTests;                                  ///< true: running unit tests, false: normal app
-    static const int    _missingParamsDelayedDisplayTimerTimeout = 1000;    ///< Timeout to wait for next missing fact to come in before display
-    QTimer              _missingParamsDelayedDisplayTimer;                  ///< Timer use to delay missing fact display
-    QStringList         _missingParams;                                     ///< List of missing facts to be displayed
+    bool                        _runningUnitTests;                                  ///< true: running unit tests, false: normal app
+    static const int            _missingParamsDelayedDisplayTimerTimeout = 1000;    ///< Timeout to wait for next missing fact to come in before display
+    QTimer                      _missingParamsDelayedDisplayTimer;                  ///< Timer use to delay missing fact display
+    QList<QPair<int,QString>>   _missingParams;                                     ///< List of missing parameter component id:name
 
     QQmlApplicationEngine* _qmlAppEngine        = nullptr;
-    bool                _logOutput              = false;                    ///< true: Log Qt debug output to file
-    bool				_fakeMobile             = false;                    ///< true: Fake ui into displaying mobile interface
-    bool                _settingsUpgraded       = false;                    ///< true: Settings format has been upgrade to new version
+    bool                _logOutput              = false;    ///< true: Log Qt debug output to file
+    bool				_fakeMobile             = false;    ///< true: Fake ui into displaying mobile interface
+    bool                _settingsUpgraded       = false;    ///< true: Settings format has been upgrade to new version
     int                 _majorVersion           = 0;
     int                 _minorVersion           = 0;
     int                 _buildVersion           = 0;
-    QGCFileDownload*    _currentVersionDownload = nullptr;
     GPSRTKFactGroup*    _gpsRtkFactGroup        = nullptr;
     QGCToolbox*         _toolbox                = nullptr;
     QQuickItem*         _mainRootWindow         = nullptr;
     bool                _bluetoothAvailable     = false;
-    QTranslator         _QGCTranslator;
-    QTranslator         _QGCTranslatorQt;
+    QTranslator         _qgcTranslatorSourceCode;           ///< translations for source code C++/Qml
+    QTranslator         _qgcTranslatorJSON;                 ///< translations for json files
+    QTranslator         _qgcTranslatorQtLibs;               ///< tranlsations for Qt libraries
     QLocale             _locale;
     bool                _error                  = false;
+    QElapsedTimer       _msecsElapsedTime;
+
+    QList<QPair<QString /* title */, QString /* message */>> _delayedAppMessages;
+
+    class CompressedSignalList {
+        Q_DISABLE_COPY(CompressedSignalList)
+
+    public:
+        CompressedSignalList() {}
+
+        void add        (const QMetaMethod & method);
+        void remove     (const QMetaMethod & method);
+        bool contains   (const QMetaObject * metaObject, int signalIndex);
+
+    private:
+        static int _signalIndex(const QMetaMethod & method);
+
+        QMap<const QMetaObject*, QSet<int> > _signalMap;
+    };
+
+    CompressedSignalList _compressedSignals;
 
     static const char* _settingsVersionKey;             ///< Settings key which hold settings version
     static const char* _deleteAllSettingsKey;           ///< If this settings key is set on boot, all settings will be deleted
 
     /// Unit Test have access to creating and destroying singletons
     friend class UnitTest;
-
 };
 
 /// @brief Returns the QGCApplication object singleton.
 QGCApplication* qgcApp(void);
-
-#endif

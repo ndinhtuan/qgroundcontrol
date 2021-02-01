@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- *   (c) 2009-2016 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
+ * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
  * QGroundControl is licensed according to the terms in the file
  * COPYING.md in the root of the source code directory.
@@ -12,9 +12,24 @@
 #include "PX4AutoPilotPlugin.h"
 #include "AirframeComponent.h"
 
+static bool isCopter(MAV_TYPE type) {
+    switch (type) {
+        case MAV_TYPE_QUADROTOR:
+        case MAV_TYPE_COAXIAL:
+        case MAV_TYPE_HELICOPTER:
+        case MAV_TYPE_HEXAROTOR:
+        case MAV_TYPE_OCTOROTOR:
+        case MAV_TYPE_TRICOPTER:
+            return true;
+        default:
+            break;
+    }
+    return false;
+}
+
 PX4TuningComponent::PX4TuningComponent(Vehicle* vehicle, AutoPilotPlugin* autopilot, QObject* parent)
     : VehicleComponent(vehicle, autopilot, parent)
-    , _name(tr("Tuning"))
+    , _name(isCopter(vehicle->vehicleType()) ? tr("PID Tuning") : tr("Tuning"))
 {
 }
 
