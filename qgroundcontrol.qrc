@@ -131,10 +131,6 @@
         <file alias="QGroundControl/Controls/QGCColoredImage.qml">src/QmlControls/QGCColoredImage.qml</file>
         <file alias="QGroundControl/Controls/QGCControlDebug.qml">src/QmlControls/QGCControlDebug.qml</file>
         <file alias="QGroundControl/Controls/QGCComboBox.qml">src/QmlControls/QGCComboBox.qml</file>
-<<<<<<< HEAD
-        <file alias="QGroundControl/Controls/QGCDynamicObjectManager.qml">src/QmlControls/QGCDynamicObjectManager.qml</file>
-=======
->>>>>>> upstream/master
         <file alias="QGroundControl/Controls/QGCFileDialog.qml">src/QmlControls/QGCFileDialog.qml</file>
         <file alias="QGroundControl/Controls/QGCFlickable.qml">src/QmlControls/QGCFlickable.qml</file>
         <file alias="QGroundControl/Controls/QGCFlickableHorizontalIndicator.qml">src/QmlControls/QGCFlickableHorizontalIndicator.qml</file>
@@ -151,15 +147,10 @@
         <file alias="QGroundControl/Controls/QGCMenuSeparator.qml">src/QmlControls/QGCMenuSeparator.qml</file>
         <file alias="QGroundControl/Controls/QGCMouseArea.qml">src/QmlControls/QGCMouseArea.qml</file>
         <file alias="QGroundControl/Controls/QGCMovableItem.qml">src/QmlControls/QGCMovableItem.qml</file>
-<<<<<<< HEAD
-        <file alias="QGroundControl/Controls/QGCOptionsComboBox.qml">src/QmlControls/QGCOptionsComboBox.qml</file>
-        <file alias="QGroundControl/Controls/QGCPipable.qml">src/QmlControls/QGCPipable.qml</file>
-=======
         <file alias="QGroundControl/Controls/QGCPopupDialog.qml">src/QmlControls/QGCPopupDialog.qml</file>
         <file alias="QGroundControl/Controls/QGCPopupDialogContainer.qml">src/QmlControls/QGCPopupDialogContainer.qml</file>
         <file alias="QGroundControl/Controls/QGCPipOverlay.qml">src/QmlControls/QGCPipOverlay.qml</file>
         <file alias="QGroundControl/Controls/QGCPipState.qml">src/QmlControls/QGCPipState.qml</file>
->>>>>>> upstream/master
         <file alias="QGroundControl/Controls/QGCRadioButton.qml">src/QmlControls/QGCRadioButton.qml</file>
         <file alias="QGroundControl/Controls/QGCSlider.qml">src/QmlControls/QGCSlider.qml</file>
         <file alias="QGroundControl/Controls/QGCSwitch.qml">src/QmlControls/QGCSwitch.qml</file>
@@ -191,12 +182,8 @@
         <file alias="QGroundControl/Controls/ToolStrip.qml">src/QmlControls/ToolStrip.qml</file>
        	<file alias="QGroundControl/Controls/ToolStripHoverButton.qml">src/QmlControls/ToolStripHoverButton.qml</file>
         <file alias="QGroundControl/Controls/TransectStyleComplexItemStats.qml">src/PlanView/TransectStyleComplexItemStats.qml</file>
-<<<<<<< HEAD
-        <file alias="QGroundControl/Controls/TransectStyleMapVisuals.qml">src/PlanView/TransectStyleMapVisuals.qml</file>
-=======
         <file alias="QGroundControl/Controls/TransectStyleComplexItemTabBar.qml">src/PlanView/TransectStyleComplexItemTabBar.qml</file>
         <file alias="QGroundControl/Controls/TransectStyleComplexItemTerrainFollow.qml">src/PlanView/TransectStyleComplexItemTerrainFollow.qml</file>
->>>>>>> upstream/master
         <file alias="QGroundControl/Controls/VehicleRotationCal.qml">src/QmlControls/VehicleRotationCal.qml</file>
         <file alias="QGroundControl/Controls/VehicleSummaryRow.qml">src/QmlControls/VehicleSummaryRow.qml</file>
         <file alias="QGroundControl/Controls/VTOLLandingPatternMapVisual.qml">src/PlanView/VTOLLandingPatternMapVisual.qml</file>
@@ -254,10 +241,6 @@
         <file alias="QGroundControl/FlightMap/CustomMapItems.qml">src/FlightMap/MapItems/CustomMapItems.qml</file>
         <file alias="QGroundControl/FlightMap/FlightMap.qml">src/FlightMap/FlightMap.qml</file>
         <file alias="QGroundControl/FlightMap/MapFitFunctions.qml">src/FlightMap/Widgets/MapFitFunctions.qml</file>
-<<<<<<< HEAD
-        <file alias="QGroundControl/FlightMap/MapLineArrow.qml">src/MissionManager/MapLineArrow.qml</file>
-=======
->>>>>>> upstream/master
         <file alias="QGroundControl/FlightMap/MapScale.qml">src/FlightMap/MapScale.qml</file>
         <file alias="QGroundControl/FlightMap/MissionItemIndicator.qml">src/FlightMap/MapItems/MissionItemIndicator.qml</file>
         <file alias="QGroundControl/FlightMap/MissionItemIndicatorDrag.qml">src/FlightMap/MapItems/MissionItemIndicatorDrag.qml</file>
@@ -274,10 +257,6 @@
         <file alias="QGroundControl/FlightMap/QGCPitchIndicator.qml">src/FlightMap/Widgets/QGCPitchIndicator.qml</file>
         <file alias="QGroundControl/FlightMap/QGCVideoBackground.qml">src/FlightMap/QGCVideoBackground.qml</file>
         <file alias="QGroundControl/FlightMap/qmldir">src/QmlControls/QGroundControl/FlightMap/qmldir</file>
-<<<<<<< HEAD
-        <file alias="QGroundControl/FlightMap/SplitIndicator.qml">src/FlightMap/MapItems/SplitIndicator.qml</file>
-=======
->>>>>>> upstream/master
         <file alias="QGroundControl/FlightMap/VehicleMapItem.qml">src/FlightMap/MapItems/VehicleMapItem.qml</file>
         <file alias="QGroundControl/ScreenTools/qmldir">src/QmlControls/QGroundControl/ScreenTools/qmldir</file>
         <file alias="QGroundControl/ScreenTools/ScreenTools.qml">src/QmlControls/ScreenTools.qml</file>
@@ -297,20 +276,17 @@
         <file alias="VehicleSummary.qml">src/VehicleSetup/VehicleSummary.qml</file>
         <file alias="VibrationPage.qml">src/AnalyzeView/VibrationPage.qml</file>
         <file alias="VirtualJoystick.qml">src/FlightDisplay/VirtualJoystick.qml</file>
-<<<<<<< HEAD
         <file>TestView.qml</file>
         <file>ManualTesting.qml</file>
         <file>TestWingIcon.qml</file>
         <file>TestDroneMainIcon.qml</file>
         <file>MotorSpeedSlider.qml</file>
         <file>BasicDemo.qml</file>
-=======
         <file alias="VTOLLandingPatternEditor.qml">src/PlanView/VTOLLandingPatternEditor.qml</file>
     </qresource>
     <qresource prefix="/FirstRunPromptDialogs">
         <file alias="UnitsFirstRunPrompt.qml">src/FirstRunPromptDialogs/UnitsFirstRunPrompt.qml</file>
         <file alias="OfflineVehicleFirstRunPrompt.qml">src/FirstRunPromptDialogs/OfflineVehicleFirstRunPrompt.qml</file>
->>>>>>> upstream/master
     </qresource>
     <qresource prefix="/json">
         <file alias="ADSBVehicleManager.SettingsGroup.json">src/Settings/ADSBVehicleManager.SettingsGroup.json</file>
