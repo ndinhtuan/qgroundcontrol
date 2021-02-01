@@ -164,7 +164,7 @@ contains(DEFINES, QGC_ENABLE_PAIRING) {
             DEFINES -= QGC_ENABLE_PAIRING
         }
     } else {
-        LIBS += -lcrypto -lz
+        LIBS += -L/home/drone/Android/Sdk/android_openssl/Qt-5.12.4_5.13.0/arm -lcrypto -lz
         AndroidBuild {
             contains(QT_ARCH, arm) {
                 LIBS += $$ANDROID_EXTRA_LIBS
