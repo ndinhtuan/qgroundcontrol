@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
+ *   (c) 2009-2016 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
  * QGroundControl is licensed according to the terms in the file
  * COPYING.md in the root of the source code directory.
@@ -16,16 +16,12 @@
 
 #define VIDEO_CAPTURE_STATUS_INTERVAL 0.2   //-- Send capture status every 5 seconds
 
-class PlanMasterController;
-class CameraSectionTest;
-
-
 class CameraSection : public Section
 {
     Q_OBJECT
 
 public:
-    CameraSection(PlanMasterController* masterController, QObject* parent = nullptr);
+    CameraSection(Vehicle* vehicle, QObject* parent = nullptr);
 
     // These enum values must match the json meta data
 
@@ -133,6 +129,4 @@ private:
     static const char* _cameraPhotoIntervalDistanceName;
     static const char* _cameraPhotoIntervalTimeName;
     static const char* _cameraModeName;
-
-    friend CameraSectionTest;
 };

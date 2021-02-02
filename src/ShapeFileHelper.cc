@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
+ *   (c) 2009-2016 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
  * QGroundControl is licensed according to the terms in the file
  * COPYING.md in the root of the source code directory.
@@ -9,10 +9,11 @@
 
 #include "ShapeFileHelper.h"
 #include "AppSettings.h"
-#include "KMLHelper.h"
+#include "KMLFileHelper.h"
 #include "SHPFileHelper.h"
 
 #include <QFile>
+#include <QVariant>
 
 const char* ShapeFileHelper::_errorPrefix = QT_TR_NOOP("Shape file load failed. %1");
 
@@ -52,7 +53,7 @@ ShapeFileHelper::ShapeType ShapeFileHelper::determineShapeType(const QString& fi
     bool fileIsKML = _fileIsKML(file, errorString);
     if (errorString.isEmpty()) {
         if (fileIsKML) {
-            shapeType = KMLHelper::determineShapeType(file, errorString);
+            shapeType = KMLFileHelper::determineShapeType(file, errorString);
         } else {
             shapeType = SHPFileHelper::determineShapeType(file, errorString);
         }
@@ -71,7 +72,7 @@ bool ShapeFileHelper::loadPolygonFromFile(const QString& file, QList<QGeoCoordin
     bool fileIsKML = _fileIsKML(file, errorString);
     if (errorString.isEmpty()) {
         if (fileIsKML) {
-            success = KMLHelper::loadPolygonFromFile(file, vertices, errorString);
+            success = KMLFileHelper::loadPolygonFromFile(file, vertices, errorString);
         } else {
             success = SHPFileHelper::loadPolygonFromFile(file, vertices, errorString);
         }
@@ -88,7 +89,7 @@ bool ShapeFileHelper::loadPolylineFromFile(const QString& file, QList<QGeoCoordi
     bool fileIsKML = _fileIsKML(file, errorString);
     if (errorString.isEmpty()) {
         if (fileIsKML) {
-            KMLHelper::loadPolylineFromFile(file, coords, errorString);
+            KMLFileHelper::loadPolylineFromFile(file, coords, errorString);
         } else {
             errorString = QString(_errorPrefix).arg(tr("Polyline not support from SHP files."));
         }

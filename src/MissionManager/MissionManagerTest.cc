@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
+ *   (c) 2009-2016 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
  * QGroundControl is licensed according to the terms in the file
  * COPYING.md in the root of the source code directory.
@@ -27,9 +27,9 @@ MissionManagerTest::MissionManagerTest(void)
     
 }
 
-void MissionManagerTest::_writeItems(MockLinkMissionItemHandler::FailureMode_t failureMode, MAV_MISSION_RESULT failureAckResult, bool shouldFail)
+void MissionManagerTest::_writeItems(MockLinkMissionItemHandler::FailureMode_t failureMode, bool shouldFail)
 {
-    _mockLink->setMissionItemFailureMode(failureMode, failureAckResult);
+    _mockLink->setMissionItemFailureMode(failureMode);
     
     // Setup our test case data
     QList<MissionItem*> missionItems;
@@ -115,11 +115,11 @@ void MissionManagerTest::_writeItems(MockLinkMissionItemHandler::FailureMode_t f
     _multiSpyMissionManager->clearAllSignals();
 }
 
-void MissionManagerTest::_roundTripItems(MockLinkMissionItemHandler::FailureMode_t failureMode, MAV_MISSION_RESULT failureAckResult, bool shouldFail)
+void MissionManagerTest::_roundTripItems(MockLinkMissionItemHandler::FailureMode_t failureMode, bool shouldFail)
 {
-    _writeItems(MockLinkMissionItemHandler::FailNone, failureAckResult, false);
+    _writeItems(MockLinkMissionItemHandler::FailNone, false);
     
-    _mockLink->setMissionItemFailureMode(failureMode, failureAckResult);
+    _mockLink->setMissionItemFailureMode(failureMode);
 
     // Read the items back from the vehicle
     _missionManager->loadFromVehicle();
@@ -168,7 +168,7 @@ void MissionManagerTest::_roundTripItems(MockLinkMissionItemHandler::FailureMode
 
     // Validate returned items
     
-    int cMissionItemsExpected;
+    size_t cMissionItemsExpected;
     
     if (shouldFail) {
         cMissionItemsExpected = 0;
@@ -182,14 +182,14 @@ void MissionManagerTest::_roundTripItems(MockLinkMissionItemHandler::FailureMode
     
     QCOMPARE(_missionManager->missionItems().count(), (int)cMissionItemsExpected);
 
-    int firstActualItem = 0;
+    size_t firstActualItem = 0;
     if (_mockLink->getFirmwareType() == MAV_AUTOPILOT_ARDUPILOTMEGA) {
         // First item is home position, don't validate it
         firstActualItem++;
     }
 
     int testCaseIndex = 0;
-    for (int actualItemIndex=firstActualItem; actualItemIndex<cMissionItemsExpected; actualItemIndex++) {
+    for (size_t actualItemIndex=firstActualItem; actualItemIndex<cMissionItemsExpected; actualItemIndex++) {
         const TestCase_t* testCase = &_rgTestCases[testCaseIndex];
 
         int expectedSequenceNumber = testCase->expectedItem.sequenceNumber;
@@ -253,8 +253,8 @@ void MissionManagerTest::_testWriteFailureHandlingWorker(void)
 
     for (size_t i=0; i<sizeof(rgTestCases)/sizeof(rgTestCases[0]); i++) {
         const WriteTestCase_t* pCase = &rgTestCases[i];
-        qDebug() << "TEST CASE _testWriteFailureHandlingWorker" << pCase->failureText;
-        _writeItems(pCase->failureMode, MAV_MISSION_ERROR, pCase->shouldFail);
+        qDebug() << "TEST CASE " << pCase->failureText;
+        _writeItems(pCase->failureMode, pCase->shouldFail);
         _mockLink->resetMissionItemHandler();
     }
 }
@@ -298,8 +298,8 @@ void MissionManagerTest::_testReadFailureHandlingWorker(void)
 
     for (size_t i=0; i<sizeof(rgTestCases)/sizeof(rgTestCases[0]); i++) {
         const ReadTestCase_t* pCase = &rgTestCases[i];
-        qDebug() << "TEST CASE _testReadFailureHandlingWorker" << pCase->failureText;
-        _roundTripItems(pCase->failureMode, MAV_MISSION_ERROR, pCase->shouldFail);
+        qDebug() << "TEST CASE " << pCase->failureText;
+        _roundTripItems(pCase->failureMode, pCase->shouldFail);
         _mockLink->resetMissionItemHandler();
         _multiSpyMissionManager->clearAllSignals();
     }
@@ -328,35 +328,4 @@ void MissionManagerTest::_testReadFailureHandlingPX4(void)
 {
     _initForFirmwareType(MAV_AUTOPILOT_PX4);
     _testReadFailureHandlingWorker();
-}
-
-void MissionManagerTest::_testErrorAckFailureStrings(void)
-{
-    _initForFirmwareType(MAV_AUTOPILOT_PX4);
-
-    typedef struct {
-        const char*                                 ackResultStr;
-        MAV_MISSION_RESULT                          ackResult;
-    } ErrorStringTestCase_t;
-
-    static const ErrorStringTestCase_t rgTestCases[] = {
-        { "MAV_MISSION_UNSUPPORTED_FRAME",  MAV_MISSION_UNSUPPORTED_FRAME },
-        { "MAV_MISSION_UNSUPPORTED",        MAV_MISSION_UNSUPPORTED },
-        { "MAV_MISSION_INVALID_PARAM1",     MAV_MISSION_INVALID_PARAM1 },
-        { "MAV_MISSION_INVALID_PARAM2",     MAV_MISSION_INVALID_PARAM2 },
-        { "MAV_MISSION_INVALID_PARAM3",     MAV_MISSION_INVALID_PARAM3 },
-        { "MAV_MISSION_INVALID_PARAM4",     MAV_MISSION_INVALID_PARAM4 },
-        { "MAV_MISSION_INVALID_PARAM5_X",   MAV_MISSION_INVALID_PARAM5_X },
-        { "MAV_MISSION_INVALID_PARAM6_Y",   MAV_MISSION_INVALID_PARAM6_Y },
-        { "MAV_MISSION_INVALID_PARAM7",     MAV_MISSION_INVALID_PARAM7 },
-        { "MAV_MISSION_INVALID_SEQUENCE",   MAV_MISSION_INVALID_SEQUENCE },
-    };
-
-    for (size_t i=0; i<sizeof(rgTestCases)/sizeof(rgTestCases[0]); i++) {
-        const ErrorStringTestCase_t* pCase = &rgTestCases[i];
-        qDebug() << "TEST CASE _testErrorAckFailureStrings" << pCase->ackResultStr;
-        _writeItems(MockLinkMissionItemHandler::FailWriteRequest1ErrorAck, pCase->ackResult, true /* shouldFail */);
-        _mockLink->resetMissionItemHandler();
-    }
-
 }

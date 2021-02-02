@@ -1,11 +1,18 @@
 /****************************************************************************
  *
- * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
+ *   (c) 2009-2016 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
  * QGroundControl is licensed according to the terms in the file
  * COPYING.md in the root of the source code directory.
  *
  ****************************************************************************/
+
+
+/*!
+    @file
+       @brief Link specific configuration base class
+       @author Gus Grubba <mavlink@grubba.com>
+*/
 
 #include "LinkConfiguration.h"
 #ifndef NO_SERIAL_LINK
@@ -24,10 +31,11 @@
 #define LINK_SETTING_ROOT "LinkConfigurations"
 
 LinkConfiguration::LinkConfiguration(const QString& name)
-    : _name         (name)
-    , _dynamic      (false)
-    , _autoConnect  (false)
-    , _highLatency  (false)
+    : _link(nullptr)
+    , _name(name)
+    , _dynamic(false)
+    , _autoConnect(false)
+    , _highLatency(false)
 {
     _name = name;
     if (_name.isEmpty()) {
@@ -37,7 +45,7 @@ LinkConfiguration::LinkConfiguration(const QString& name)
 
 LinkConfiguration::LinkConfiguration(LinkConfiguration* copy)
 {
-    _link       = copy->_link;
+    _link       = copy->link();
     _name       = copy->name();
     _dynamic    = copy->isDynamic();
     _autoConnect= copy->isAutoConnect();
@@ -48,7 +56,7 @@ LinkConfiguration::LinkConfiguration(LinkConfiguration* copy)
 void LinkConfiguration::copyFrom(LinkConfiguration* source)
 {
     Q_ASSERT(source != nullptr);
-    _link       = source->_link;
+    _link       = source->link();
     _name       = source->name();
     _dynamic    = source->isDynamic();
     _autoConnect= source->isAutoConnect();
@@ -144,8 +152,10 @@ void LinkConfiguration::setName(const QString name)
     emit nameChanged(name);
 }
 
-void LinkConfiguration::setLink(SharedLinkInterfacePtr link)
+void LinkConfiguration::setLink(LinkInterface* link)
 {
-    _link = link;
-    emit linkChanged();
+    if(_link != link) {
+        _link = link;
+        emit linkChanged(link);
+    }
 }

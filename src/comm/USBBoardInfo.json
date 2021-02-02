@@ -1,7 +1,9 @@
-﻿{
+{
     "comment":  "AutoConnect usb board info",
-    "version":  1,
-    "fileType": "USBBoardInfo",
+
+    "version":          1,
+    "fileType":         "USBBoardInfo",
+    "groundStation":    "QGroundControl",
 
     "boardInfo": [
         { "vendorID": 9900, "productID": 16,        "boardClass": "Pixhawk",    "name": "PX4 FMU V1" },
@@ -18,14 +20,9 @@
         { "vendorID": 9900, "productID": 22,        "boardClass": "Pixhawk",    "name": "Crazyflie 2" },
         { "vendorID": 9900, "productID": 1,         "boardClass": "Pixhawk",    "name": "Omnibus F4 SD" },
         { "vendorID": 8137, "productID": 28,        "boardClass": "Pixhawk",    "name": "PX4 FMUK66 v3.x" },
-        { "vendorID": 1155, "productID": 41775,     "boardClass": "Pixhawk",    "name": "PX4 FMU ModalAI FCv1" },
-        { "vendorID":12642, "productID": 75,        "boardClass": "Pixhawk",    "name": "PX4 DurandalV1" },
-        { "vendorID": 4104, "productID": 1,         "boardClass": "Pixhawk",    "name": "PX4 FMU UVify Core" },
-        { "vendorID": 12643, "productID": 76,       "boardClass": "Pixhawk",    "name": "CUAV Flight Controller" },
 
         { "vendorID": 1155, "productID": 22336,     "boardClass": "Pixhawk",    "name": "ArduPilot ChibiOS" },
         { "vendorID": 4617, "productID": 22336,     "boardClass": "Pixhawk",    "name": "ArduPilot ChibiOS" },
-        { "vendorID": 4617, "productID": 22337,     "boardClass": "Pixhawk",    "name": "ArduPilot ChibiOS" },
 
         { "vendorID": 12642, "productID": 0,        "boardClass": "Pixhawk",    "name": "Holybro" },
 
@@ -69,7 +66,6 @@
         { "regExp": "^Crazyflie BL",        "boardClass": "Pixhawk" },
         { "regExp": "^PX4 OmnibusF4SD",     "boardClass": "Pixhawk" },
         { "regExp": "^fmuv[2345]$",         "boardClass": "Pixhawk" },
-        { "regExp": "^mRoControlZeroF7",    "boardClass": "Pixhawk" },
         { "regExp": "PX4.*Flow",            "boardClass": "PX4 Flow" },
         { "regExp": "^FT231X USB UART$",    "boardClass": "SiK Radio" },
         { "regExp": "USB UART$",            "boardClass": "SiK Radio",  "androidOnly": true, "comment": "Very broad fallback, too dangerous for non-android" }
@@ -78,7 +74,6 @@
     "boardManufacturerFallback": [
         { "regExp": "^ArduPilot$",      "boardClass": "Pixhawk" },
         { "regExp": "^Hex/ProfiCNC$",   "boardClass": "Pixhawk" },
-        { "regExp": "^Holybro$",        "boardClass": "Pixhawk" },
-        { "regExp": "^mRo$",            "boardClass": "Pixhawk" }
+        { "regExp": "^Holybro$",        "boardClass": "Pixhawk" }
     ]
 }

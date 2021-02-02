@@ -1,13 +1,15 @@
 /****************************************************************************
  *
- * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
+ *   (c) 2009-2016 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
  * QGroundControl is licensed according to the terms in the file
  * COPYING.md in the root of the source code directory.
  *
  ****************************************************************************/
 
-#pragma once
+
+#ifndef QGCTemporaryFile_H
+#define QGCTemporaryFile_H
 
 #include <QFile>
 
@@ -28,15 +30,13 @@ public:
 	//							directory path, only file name.
     QGCTemporaryFile(const QString& fileTemplate, QObject* parent = nullptr);
 
-    ~QGCTemporaryFile();
-
+	/// @brief Opens the file in ReadWrite mode.
+	///		@returns false - open failed
 	bool open(OpenMode openMode = ReadWrite);
-
-    void setAutoRemove(bool autoRemove) { _autoRemove = autoRemove; }
     
 private:
-    static QString _newTempFileFullyQualifiedName(const QString& fileTemplate);
-
     QString _template;
-    bool    _autoRemove = false;
 };
+
+
+#endif

@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
+ *   (c) 2009-2016 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
  * QGroundControl is licensed according to the terms in the file
  * COPYING.md in the root of the source code directory.
@@ -293,24 +293,6 @@ LogDownloadController::_findMissingEntries()
     }
 }
 
-void LogDownloadController::_updateDataRate(void)
-{
-    if (_downloadData->elapsed.elapsed() >= kGUIRateMilliseconds) {
-        //-- Update download rate
-        qreal rrate = _downloadData->rate_bytes / (_downloadData->elapsed.elapsed() / 1000.0);
-        _downloadData->rate_avg = (_downloadData->rate_avg * 0.95) + (rrate * 0.05);
-        _downloadData->rate_bytes = 0;
-
-        //-- Update status
-        const QString status = QString("%1 (%2/s)").arg(QGCMapEngine::bigSizeToString(_downloadData->written),
-                                                        QGCMapEngine::bigSizeToString(_downloadData->rate_avg));
-
-        _downloadData->entry->setStatus(status);
-        _downloadData->elapsed.start();
-    }
-}
-
-
 //----------------------------------------------------------------------------------------
 void
 LogDownloadController::_logData(UASInterface* uas, uint32_t ofs, uint16_t id, uint8_t count, const uint8_t* data)
@@ -355,7 +337,19 @@ LogDownloadController::_logData(UASInterface* uas, uint32_t ofs, uint16_t id, ui
         if(_downloadData->file.write((const char*)data, count)) {
             _downloadData->written += count;
             _downloadData->rate_bytes += count;
-            _updateDataRate();
+            if (_downloadData->elapsed.elapsed() >= kGUIRateMilliseconds) {
+                //-- Update download rate
+                qreal rrate = _downloadData->rate_bytes/(_downloadData->elapsed.elapsed()/1000.0);
+                _downloadData->rate_avg = _downloadData->rate_avg*0.95 + rrate*0.05;
+                _downloadData->rate_bytes = 0;
+
+                //-- Update status
+                const QString status = QString("%1 (%2/s)").arg(QGCMapEngine::bigSizeToString(_downloadData->written),
+                                                                QGCMapEngine::bigSizeToString(_downloadData->rate_avg));
+
+                _downloadData->entry->setStatus(status);
+                _downloadData->elapsed.start();
+            }
             result = true;
             //-- reset retries
             _retries = 0;
@@ -428,20 +422,13 @@ LogDownloadController::_findMissingData()
         _downloadData->advanceChunk();
     }
 
-    _retries++;
-#if 0
-    // Trying the change to infinite log download. This way if retries hit 100% failure the data rate will
-    // slowly fall to 0 and the user can Cancel. This should work better on really crappy links.
-    if(_retries > 5) {
+    if(_retries++ > 2) {
         _downloadData->entry->setStatus(tr("Timed Out"));
         //-- Give up
         qWarning() << "Too many errors retreiving log data. Giving up.";
         _receivedAllData();
         return;
     }
-#endif
-
-    _updateDataRate();
 
     uint16_t start = 0, end = 0;
     const int size = _downloadData->chunk_table.size();
@@ -459,31 +446,26 @@ LogDownloadController::_findMissingData()
 
     const uint32_t pos = _downloadData->current_chunk*kChunkSize + start*MAVLINK_MSG_LOG_DATA_FIELD_DATA_LEN,
                    len = (end - start)*MAVLINK_MSG_LOG_DATA_FIELD_DATA_LEN;
-    _requestLogData(_downloadData->ID, pos, len, _retries);
+    _requestLogData(_downloadData->ID, pos, len);
 }
 
 //----------------------------------------------------------------------------------------
 void
-LogDownloadController::_requestLogData(uint16_t id, uint32_t offset, uint32_t count, int retryCount)
+LogDownloadController::_requestLogData(uint16_t id, uint32_t offset, uint32_t count)
 {
-    if (_vehicle) {
-        WeakLinkInterfacePtr weakLink = _vehicle->vehicleLinkManager()->primaryLink();
-        if (!weakLink.expired()) {
-            SharedLinkInterfacePtr sharedLink = weakLink.lock();
-
-            //-- APM "Fix"
-            id += _apmOneBased;
-            qCDebug(LogDownloadLog) << "Request log data (id:" << id << "offset:" << offset << "size:" << count << "retryCount" << retryCount << ")";
-            mavlink_message_t msg;
-            mavlink_msg_log_request_data_pack_chan(
-                        qgcApp()->toolbox()->mavlinkProtocol()->getSystemId(),
-                        qgcApp()->toolbox()->mavlinkProtocol()->getComponentId(),
-                        sharedLink->mavlinkChannel(),
-                        &msg,
-                        _vehicle->id(), _vehicle->defaultComponentId(),
-                        id, offset, count);
-            _vehicle->sendMessageOnLinkThreadSafe(sharedLink.get(), msg);
-        }
+    if(_vehicle) {
+        //-- APM "Fix"
+        id += _apmOneBased;
+        qCDebug(LogDownloadLog) << "Request log data (id:" << id << "offset:" << offset << "size:" << count << ")";
+        mavlink_message_t msg;
+        mavlink_msg_log_request_data_pack_chan(
+                    qgcApp()->toolbox()->mavlinkProtocol()->getSystemId(),
+                    qgcApp()->toolbox()->mavlinkProtocol()->getComponentId(),
+                    _vehicle->priorityLink()->mavlinkChannel(),
+                    &msg,
+                    qgcApp()->toolbox()->multiVehicleManager()->activeVehicle()->id(), qgcApp()->toolbox()->multiVehicleManager()->activeVehicle()->defaultComponentId(),
+                    id, offset, count);
+        _vehicle->sendMessageOnLink(_vehicle->priorityLink(), msg);
     }
 }
 
@@ -503,22 +485,17 @@ LogDownloadController::_requestLogList(uint32_t start, uint32_t end)
     if(_vehicle && _uas) {
         qCDebug(LogDownloadLog) << "Request log entry list (" << start << "through" << end << ")";
         _setListing(true);
-        WeakLinkInterfacePtr weakLink = _vehicle->vehicleLinkManager()->primaryLink();
-        if (!weakLink.expired()) {
-            SharedLinkInterfacePtr sharedLink = weakLink.lock();
-
-            mavlink_message_t msg;
-            mavlink_msg_log_request_list_pack_chan(
-                        qgcApp()->toolbox()->mavlinkProtocol()->getSystemId(),
-                        qgcApp()->toolbox()->mavlinkProtocol()->getComponentId(),
-                        sharedLink->mavlinkChannel(),
-                        &msg,
-                        _vehicle->id(),
-                        _vehicle->defaultComponentId(),
-                        start,
-                        end);
-            _vehicle->sendMessageOnLinkThreadSafe(sharedLink.get(), msg);
-        }
+        mavlink_message_t msg;
+        mavlink_msg_log_request_list_pack_chan(
+                    qgcApp()->toolbox()->mavlinkProtocol()->getSystemId(),
+                    qgcApp()->toolbox()->mavlinkProtocol()->getComponentId(),
+                    _vehicle->priorityLink()->mavlinkChannel(),
+                    &msg,
+                    _vehicle->id(),
+                    _vehicle->defaultComponentId(),
+                    start,
+                    end);
+        _vehicle->sendMessageOnLink(_vehicle->priorityLink(), msg);
         //-- Wait 5 seconds before bitching about not getting anything
         _timer.start(5000);
     }
@@ -529,9 +506,19 @@ void
 LogDownloadController::download(QString path)
 {
     QString dir = path;
-    if (dir.isEmpty()) {
+#if defined(__mobile__)
+    if(dir.isEmpty()) {
         dir = qgcApp()->toolbox()->settingsManager()->appSettings()->logSavePath();
     }
+#else
+    if(dir.isEmpty()) {
+        dir = QString(); //-- TODO: QGCQFileDialog::getExistingDirectory(
+        //        MainWindow::instance(),
+        //        tr("Log Download Directory"),
+        //        QDir::homePath(),
+        //        QGCQFileDialog::ShowDirsOnly | QGCQFileDialog::DontResolveSymlinks);
+    }
+#endif
     downloadToDirectory(dir);
 }
 
@@ -540,9 +527,10 @@ void LogDownloadController::downloadToDirectory(const QString& dir)
     //-- Stop listing just in case
     _receivedAllEntries();
     //-- Reset downloads, again just in case
-    delete _downloadData;
-    _downloadData = nullptr;
-
+    if(_downloadData) {
+        delete _downloadData;
+        _downloadData = 0;
+    }
     _downloadPath = dir;
     if(!_downloadPath.isEmpty()) {
         if(!_downloadPath.endsWith(QDir::separator()))
@@ -585,9 +573,10 @@ LogDownloadController::_getNextSelected()
 bool
 LogDownloadController::_prepareLogDownload()
 {
-    delete _downloadData;
-    _downloadData = nullptr;
-
+    if(_downloadData) {
+        delete _downloadData;
+        _downloadData = nullptr;
+    }
     QGCLogEntry* entry = _getNextSelected();
     if(!entry) {
         return false;
@@ -656,7 +645,7 @@ LogDownloadController::_setDownloading(bool active)
 {
     if (_downloadingLogs != active) {
         _downloadingLogs = active;
-        _vehicle->vehicleLinkManager()->setCommunicationLostEnabled(!active);
+        _vehicle->setConnectionLostEnabled(!active);
         emit downloadingLogsChanged();
     }
 }
@@ -667,7 +656,7 @@ LogDownloadController::_setListing(bool active)
 {
     if (_requestingLogEntries != active) {
         _requestingLogEntries = active;
-        _vehicle->vehicleLinkManager()->setCommunicationLostEnabled(!active);
+        _vehicle->setConnectionLostEnabled(!active);
         emit requestingListChanged();
     }
 }
@@ -677,19 +666,14 @@ void
 LogDownloadController::eraseAll(void)
 {
     if(_vehicle && _uas) {
-        WeakLinkInterfacePtr weakLink = _vehicle->vehicleLinkManager()->primaryLink();
-        if (!weakLink.expired()) {
-            SharedLinkInterfacePtr sharedLink = weakLink.lock();
-
-            mavlink_message_t msg;
-            mavlink_msg_log_erase_pack_chan(
-                        qgcApp()->toolbox()->mavlinkProtocol()->getSystemId(),
-                        qgcApp()->toolbox()->mavlinkProtocol()->getComponentId(),
-                        sharedLink->mavlinkChannel(),
-                        &msg,
-                        qgcApp()->toolbox()->multiVehicleManager()->activeVehicle()->id(), qgcApp()->toolbox()->multiVehicleManager()->activeVehicle()->defaultComponentId());
-            _vehicle->sendMessageOnLinkThreadSafe(sharedLink.get(), msg);
-        }
+        mavlink_message_t msg;
+        mavlink_msg_log_erase_pack_chan(
+                    qgcApp()->toolbox()->mavlinkProtocol()->getSystemId(),
+                    qgcApp()->toolbox()->mavlinkProtocol()->getComponentId(),
+                    _vehicle->priorityLink()->mavlinkChannel(),
+                    &msg,
+                    qgcApp()->toolbox()->multiVehicleManager()->activeVehicle()->id(), qgcApp()->toolbox()->multiVehicleManager()->activeVehicle()->defaultComponentId());
+        _vehicle->sendMessageOnLink(_vehicle->priorityLink(), msg);
         refresh();
     }
 }

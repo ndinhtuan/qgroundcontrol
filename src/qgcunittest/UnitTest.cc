@@ -1,22 +1,23 @@
 /****************************************************************************
  *
- * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
+ *   (c) 2009-2016 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
  * QGroundControl is licensed according to the terms in the file
  * COPYING.md in the root of the source code directory.
  *
  ****************************************************************************/
 
+
+/// @file
+///     @brief Base class for all unit tests
+///
+///     @author Don Gagne <don@thegagnes.com>
+
 #include "UnitTest.h"
 #include "QGCApplication.h"
 #include "MAVLinkProtocol.h"
 #include "Vehicle.h"
-#include "AppSettings.h"
-#include "SettingsManager.h"
-#include "MockLink.h"
-#include "LinkManager.h"
 
-#include <QRandomGenerator>
 #include <QTemporaryFile>
 #include <QTime>
 
@@ -32,6 +33,15 @@ enum UnitTest::FileDialogType UnitTest::_fileDialogExpectedType = getOpenFileNam
 int UnitTest::_missedFileDialogCount = 0;
 
 UnitTest::UnitTest(void)
+    : _linkManager(nullptr)
+    , _mockLink(nullptr)
+    , _mainWindow(nullptr)
+    , _vehicle(nullptr)
+    , _expectMissedFileDialog(false)
+    , _expectMissedMessageBox(false)
+    , _unitTestRun(false)
+    , _initCalled(false)
+    , _cleanupCalled(false)
 {    
 
 }
@@ -45,9 +55,9 @@ UnitTest::~UnitTest()
     }
 }
 
-void UnitTest::_addTest(UnitTest* test)
+void UnitTest::_addTest(QObject* test)
 {
-    QList<UnitTest*>& tests = _testList();
+	QList<QObject*>& tests = _testList();
 
     Q_ASSERT(!tests.contains(test));
     
@@ -60,9 +70,9 @@ void UnitTest::_unitTestCalled(void)
 }
 
 /// @brief Returns the list of unit tests.
-QList<UnitTest*>& UnitTest::_testList(void)
+QList<QObject*>& UnitTest::_testList(void)
 {
-    static QList<UnitTest*> tests;
+	static QList<QObject*> tests;
 	return tests;
 }
 
@@ -70,11 +80,8 @@ int UnitTest::run(QString& singleTest)
 {
     int ret = 0;
     
-    for (UnitTest* test: _testList()) {
+    for (QObject* test: _testList()) {
         if (singleTest.isEmpty() || singleTest == test->objectName()) {
-            if (test->standalone() && singleTest.isEmpty()) {
-                continue;
-            }
             QStringList args;
             args << "*" << "-maxwarnings" << "0";
             ret += QTest::qExec(test, args);
@@ -92,14 +99,10 @@ void UnitTest::init(void)
 
     if (!_linkManager) {
         _linkManager = qgcApp()->toolbox()->linkManager();
+        connect(_linkManager, &LinkManager::linkDeleted, this, &UnitTest::_linkDeleted);
     }
 
     _linkManager->restart();
-
-    // Force offline vehicle back to defaults
-    AppSettings* appSettings = qgcApp()->toolbox()->settingsManager()->appSettings();
-    appSettings->offlineEditingFirmwareClass()->setRawValue(appSettings->offlineEditingFirmwareClass()->rawDefaultValue());
-    appSettings->offlineEditingVehicleClass()->setRawValue(appSettings->offlineEditingVehicleClass()->rawDefaultValue());
     
     _messageBoxRespondedTo = false;
     _missedMessageBoxCount = 0;
@@ -124,6 +127,10 @@ void UnitTest::cleanup(void)
     _cleanupCalled = true;
 
     _disconnectMockLink();
+    _closeMainWindow();
+
+    // We add a slight delay here to allow for deleteLater and Qml cleanup
+    QTest::qWait(200);
 
     // Keep in mind that any code below these QCOMPARE may be skipped if the compare fails
     if (_expectMissedMessageBox) {
@@ -367,8 +374,6 @@ void UnitTest::_connectMockLink(MAV_AUTOPILOT autopilot)
 {
     Q_ASSERT(!_mockLink);
 
-    QSignalSpy spyVehicle(qgcApp()->toolbox()->multiVehicleManager(), &MultiVehicleManager::activeVehicleChanged);
-
     switch (autopilot) {
     case MAV_AUTOPILOT_PX4:
         _mockLink = MockLink::startPX4MockLink(false);
@@ -379,38 +384,37 @@ void UnitTest::_connectMockLink(MAV_AUTOPILOT autopilot)
     case MAV_AUTOPILOT_GENERIC:
         _mockLink = MockLink::startGenericMockLink(false);
         break;
-    case MAV_AUTOPILOT_INVALID:
-        _mockLink = MockLink::startNoInitialConnectMockLink(false);
-        break;
     default:
         qWarning() << "Type not supported";
         break;
     }
 
     // Wait for the Vehicle to get created
+    QSignalSpy spyVehicle(qgcApp()->toolbox()->multiVehicleManager(), SIGNAL(parameterReadyVehicleAvailableChanged(bool)));
     QCOMPARE(spyVehicle.wait(10000), true);
+    QVERIFY(qgcApp()->toolbox()->multiVehicleManager()->parameterReadyVehicleAvailable());
     _vehicle = qgcApp()->toolbox()->multiVehicleManager()->activeVehicle();
     QVERIFY(_vehicle);
 
-    if (autopilot != MAV_AUTOPILOT_INVALID) {
-        // Wait for initial connect sequence to complete
-        QSignalSpy spyPlan(_vehicle, &Vehicle::initialConnectComplete);
-        QCOMPARE(spyPlan.wait(30000), true);
+    // Wait for plan request to complete
+    if (!_vehicle->initialPlanRequestComplete()) {
+        QSignalSpy spyPlan(_vehicle, SIGNAL(initialPlanRequestCompleteChanged(bool)));
+        QCOMPARE(spyPlan.wait(10000), true);
     }
 }
 
 void UnitTest::_disconnectMockLink(void)
 {
     if (_mockLink) {
-        QSignalSpy spyVehicle(qgcApp()->toolbox()->multiVehicleManager(), &MultiVehicleManager::activeVehicleChanged);
+        QSignalSpy  linkSpy(_linkManager, SIGNAL(linkDeleted(LinkInterface*)));
 
-        _mockLink->disconnect();
-        _mockLink = nullptr;
+        _linkManager->disconnectLink(_mockLink);
 
-        // Wait for all the vehicle to go away
-        QCOMPARE(spyVehicle.wait(10000), true);
-        _vehicle = qgcApp()->toolbox()->multiVehicleManager()->activeVehicle();
-        QVERIFY(!_vehicle);
+        // Wait for link to go away
+        linkSpy.wait(1000);
+        QCOMPARE(linkSpy.count(), 1);
+
+        _vehicle = nullptr;
     }
 }
 
@@ -421,17 +425,47 @@ void UnitTest::_linkDeleted(LinkInterface* link)
     }
 }
 
+void UnitTest::_createMainWindow(void)
+{
+    //-- TODO
+#if 0
+    _mainWindow = MainWindow::_create();
+    Q_CHECK_PTR(_mainWindow);
+#endif
+}
+
+void UnitTest::_closeMainWindow(bool cancelExpected)
+{
+    //-- TODO
+#if 0
+    if (_mainWindow) {
+        QSignalSpy  mainWindowSpy(_mainWindow, SIGNAL(mainWindowClosed()));
+
+        _mainWindow->close();
+
+        mainWindowSpy.wait(2000);
+        QCOMPARE(mainWindowSpy.count(), cancelExpected ? 0 : 1);
+
+        // This leaves enough time for any dangling Qml components to get cleaned up.
+        // This prevents qWarning from bad references in Qml
+        QTest::qWait(1000);
+    }
+#else
+    Q_UNUSED(cancelExpected);
+#endif
+}
+
 QString UnitTest::createRandomFile(uint32_t byteCount)
 {
     QTemporaryFile tempFile;
 
     QTime time = QTime::currentTime();
-    QRandomGenerator::global()->seed(time.msec());
+    qsrand((uint)time.msec());
 
     tempFile.setAutoRemove(false);
     if (tempFile.open()) {
         for (uint32_t bytesWritten=0; bytesWritten<byteCount; bytesWritten++) {
-            unsigned char byte = (QRandomGenerator::global()->generate() * 0xFF) / RAND_MAX;
+            unsigned char byte = (qrand() * 0xFF) / RAND_MAX;
             tempFile.write((char *)&byte, 1);
         }
         tempFile.close();
@@ -489,6 +523,19 @@ bool UnitTest::fileCompare(const QString& file1, const QString& file2)
     return true;
 }
 
+bool UnitTest::doubleNaNCompare(double value1, double value2)
+{
+    if (qIsNaN(value1) && qIsNaN(value2)) {
+        return true;
+    } else {
+        bool ret = qFuzzyCompare(value1, value2);
+        if (!ret) {
+            qDebug() << value1 << value2;
+        }
+        return ret;
+    }
+}
+
 void UnitTest::changeFactValue(Fact* fact,double increment)
 {
     if (fact->typeIsBool()) {
@@ -507,21 +554,16 @@ void UnitTest::_missionItemsEqual(MissionItem& actual, MissionItem& expected)
     QCOMPARE(static_cast<int>(actual.frame()),      static_cast<int>(expected.frame()));
     QCOMPARE(actual.autoContinue(),                 expected.autoContinue());
 
-    QVERIFY(QGC::fuzzyCompare(actual.param1(), expected.param1()));
-    QVERIFY(QGC::fuzzyCompare(actual.param2(), expected.param2()));
-    QVERIFY(QGC::fuzzyCompare(actual.param3(), expected.param3()));
-    QVERIFY(QGC::fuzzyCompare(actual.param4(), expected.param4()));
-    QVERIFY(QGC::fuzzyCompare(actual.param5(), expected.param5()));
-    QVERIFY(QGC::fuzzyCompare(actual.param6(), expected.param6()));
-    QVERIFY(QGC::fuzzyCompare(actual.param7(), expected.param7()));
+    QVERIFY(UnitTest::doubleNaNCompare(actual.param1(), expected.param1()));
+    QVERIFY(UnitTest::doubleNaNCompare(actual.param2(), expected.param2()));
+    QVERIFY(UnitTest::doubleNaNCompare(actual.param3(), expected.param3()));
+    QVERIFY(UnitTest::doubleNaNCompare(actual.param4(), expected.param4()));
+    QVERIFY(UnitTest::doubleNaNCompare(actual.param5(), expected.param5()));
+    QVERIFY(UnitTest::doubleNaNCompare(actual.param6(), expected.param6()));
+    QVERIFY(UnitTest::doubleNaNCompare(actual.param7(), expected.param7()));
 }
 
 bool UnitTest::fuzzyCompareLatLon(const QGeoCoordinate& coord1, const QGeoCoordinate& coord2)
 {
     return coord1.distanceTo(coord2) < 1.0;
-}
-
-QGeoCoordinate UnitTest::changeCoordinateValue(const QGeoCoordinate& coordinate)
-{
-    return coordinate.atDistanceAndAzimuth(1, 0);
 }

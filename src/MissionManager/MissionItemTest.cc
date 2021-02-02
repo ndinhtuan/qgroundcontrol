@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
+ *   (c) 2009-2016 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
  * QGroundControl is licensed according to the terms in the file
  * COPYING.md in the root of the source code directory.
@@ -28,19 +28,23 @@ const size_t MissionItemTest::_cTestCases = sizeof(_rgTestCases)/sizeof(_rgTestC
 #endif
 
 MissionItemTest::MissionItemTest(void)
-    : _masterController(nullptr)
+    : _offlineVehicle(nullptr)
 {
 }
 
 void MissionItemTest::init(void)
 {
     UnitTest::init();
-    _masterController = new PlanMasterController(this);
+    _offlineVehicle = new Vehicle(MAV_AUTOPILOT_PX4,
+                                  MAV_TYPE_QUADROTOR,
+                                  qgcApp()->toolbox()->firmwarePluginManager(),
+                                  this);
+
 }
 
 void MissionItemTest::cleanup(void)
 {
-    _masterController->deleteLater();
+    delete _offlineVehicle;
     UnitTest::cleanup();
 }
 
@@ -278,7 +282,7 @@ void MissionItemTest::_testSimpleLoadFromStream(void)
 {
     // We specifically test SimpleMissionItem loading as well since it has additional
     // signalling which can affect values.
-    SimpleMissionItem simpleMissionItem(_masterController, false /* flyView */, false /* forLoad */, nullptr);
+    SimpleMissionItem simpleMissionItem(_offlineVehicle, false /* flyView */, nullptr);
 
     QString testString("10\t0\t3\t80\t10\t20\t30\t40\t-10\t-20\t-30\t1\r\n");
     QTextStream testStream(&testString, QIODevice::ReadOnly);
@@ -448,7 +452,7 @@ void MissionItemTest::_testSimpleLoadFromJson(void)
     // We specifically test SimpleMissionItem loading as well since it has additional
     // signalling which can affect values.
 
-    SimpleMissionItem simpleMissionItem(_masterController, false /* flyView */, false /* forLoad */, nullptr);
+    SimpleMissionItem simpleMissionItem(_offlineVehicle, false /* flyView */, nullptr);
     QString     errorString;
     QJsonArray  coordinateArray;
     QJsonObject jsonObject;

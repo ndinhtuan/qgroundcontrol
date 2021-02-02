@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
+ *   (c) 2009-2016 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
  * QGroundControl is licensed according to the terms in the file
  * COPYING.md in the root of the source code directory.
@@ -129,13 +129,6 @@ QString APMParameterMetaData::mavTypeToString(MAV_TYPE vehicleTypeEnum)
     return vehicleName;
 }
 
-QString APMParameterMetaData::_groupFromParameterName(const QString& name)
-{
-    QString group = name.split('_').first();
-    return group.remove(QRegExp("[0-9]*$")); // remove any numbers from the end
-}
-
-
 void APMParameterMetaData::loadParameterFactMetaDataFile(const QString& metaDataFile)
 {
     if (_parameterMetaDataLoaded) {
@@ -239,9 +232,13 @@ void APMParameterMetaData::loadParameterFactMetaDataFile(const QString& metaData
                 if (name.contains(':')) {
                     name = name.split(':').last();
                 }
-                QString group = _groupFromParameterName(name);
+                QString group = name.split('_').first();
+                group = group.remove(QRegExp("[0-9]*$")); // remove any numbers from the end
 
                 QString category = xml.attributes().value("user").toString();
+                if (category.isEmpty()) {
+                    category = QStringLiteral("Advanced");
+                }
 
                 QString shortDescription = xml.attributes().value("humanName").toString();
                 QString longDescription = xml.attributes().value("documentation").toString();
@@ -257,15 +254,13 @@ void APMParameterMetaData::loadParameterFactMetaDataFile(const QString& metaData
                     qCDebug(APMParameterMetaDataLog) << "Duplicate parameter found:" << name;
                     rawMetaData = _vehicleTypeToParametersMap[currentCategory][name];
                 } else {
-                    rawMetaData = new APMFactMetaDataRaw(this);
+                    rawMetaData = new APMFactMetaDataRaw();
                     _vehicleTypeToParametersMap[currentCategory][name] = rawMetaData;
                     groupMembers[group] << name;
                 }
                 qCDebug(APMParameterMetaDataVerboseLog) << "inserting metadata for field" << name;
                 rawMetaData->name = name;
-                if (!category.isEmpty()) {
-                    rawMetaData->category = category;
-                }
+                rawMetaData->category = category;
                 rawMetaData->group = group;
                 rawMetaData->shortDescription = shortDescription;
                 rawMetaData->longDescription = longDescription;
@@ -424,32 +419,29 @@ bool APMParameterMetaData::parseParameterAttributes(QXmlStreamReader& xml, APMFa
     return true;
 }
 
-FactMetaData* APMParameterMetaData::getMetaDataForFact(const QString& name, MAV_TYPE vehicleType, FactMetaData::ValueType_t type)
+void APMParameterMetaData::addMetaDataToFact(Fact* fact, MAV_TYPE vehicleType)
 {
     const QString mavTypeString = mavTypeToString(vehicleType);
     APMFactMetaDataRaw* rawMetaData = nullptr;
 
     // check if we have metadata for fact, use generic otherwise
-    if (_vehicleTypeToParametersMap[mavTypeString].contains(name)) {
-        rawMetaData = _vehicleTypeToParametersMap[mavTypeString][name];
-    } else if (_vehicleTypeToParametersMap["libraries"].contains(name)) {
-        rawMetaData = _vehicleTypeToParametersMap["libraries"][name];
+    if (_vehicleTypeToParametersMap[mavTypeString].contains(fact->name())) {
+        rawMetaData = _vehicleTypeToParametersMap[mavTypeString][fact->name()];
+    } else if (_vehicleTypeToParametersMap["libraries"].contains(fact->name())) {
+        rawMetaData = _vehicleTypeToParametersMap["libraries"][fact->name()];
     }
 
-    FactMetaData *metaData = new FactMetaData(type, this);
+    FactMetaData *metaData = new FactMetaData(fact->type(), fact);
 
     // we don't have data for this fact
     if (!rawMetaData) {
-        metaData->setCategory(QStringLiteral("Advanced"));
-        metaData->setGroup(_groupFromParameterName(name));
-        qCDebug(APMParameterMetaDataLog) << "No metaData for " << name << "using generic metadata";
-        return metaData;
+        fact->setMetaData(metaData);
+        qCDebug(APMParameterMetaDataLog) << "No metaData for " << fact->name() << "using generic metadata";
+        return;
     }
 
     metaData->setName(rawMetaData->name);
-    if (!rawMetaData->category.isEmpty()) {
-        metaData->setCategory(rawMetaData->category);
-    }
+    metaData->setCategory(rawMetaData->category);
     metaData->setGroup(rawMetaData->group);
     metaData->setVehicleRebootRequired(rawMetaData->rebootRequired);
 
@@ -531,7 +523,7 @@ FactMetaData* APMParameterMetaData::getMetaDataForFact(const QString& name, MAV_
 
             QVariant typedBitSet;
 
-            switch (type) {
+            switch (fact->type()) {
             case FactMetaData::valueTypeInt8:
                 typedBitSet = QVariant((signed char)bitSet);
                 break;
@@ -599,15 +591,15 @@ FactMetaData* APMParameterMetaData::getMetaDataForFact(const QString& name, MAV_
     }
 
     // ArduPilot does not yet support decimal places meta data. So for P/I/D parameters we force to 6 places
-    if ((name.endsWith(QStringLiteral("_P")) ||
-         name.endsWith(QStringLiteral("_I")) ||
-         name.endsWith(QStringLiteral("_D"))) &&
-            (type == FactMetaData::valueTypeFloat ||
-             type == FactMetaData::valueTypeDouble)) {
+    if ((fact->name().endsWith(QStringLiteral("_P")) ||
+         fact->name().endsWith(QStringLiteral("_I")) ||
+         fact->name().endsWith(QStringLiteral("_D"))) &&
+            (fact->type() == FactMetaData::valueTypeFloat ||
+             fact->type() == FactMetaData::valueTypeDouble)) {
         metaData->setDecimalPlaces(6);
     }
 
-    return metaData;
+    fact->setMetaData(metaData);
 }
 
 void APMParameterMetaData::getParameterMetaDataVersionInfo(const QString& metaDataFile, int& majorVersion, int& minorVersion)

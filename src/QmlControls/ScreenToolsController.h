@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
+ *   (c) 2009-2016 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
  * QGroundControl is licensed according to the terms in the file
  * COPYING.md in the root of the source code directory.
@@ -9,7 +9,7 @@
 
 
 /// @file
-///     @author Gus Grubba <gus@auterion.com>
+///     @author Gus Grubba <mavlink@grubba.com>
 
 #ifndef ScreenToolsController_H
 #define ScreenToolsController_H
@@ -46,9 +46,6 @@ public:
     // Returns current mouse position
     Q_INVOKABLE int mouseX(void) { return QCursor::pos().x(); }
     Q_INVOKABLE int mouseY(void) { return QCursor::pos().y(); }
-
-    // QFontMetrics::descent for default font
-    Q_INVOKABLE double defaultFontDescent(int pointSize) const;
 
 #if defined(__mobile__)
     bool    isMobile            () const { return true;  }
@@ -106,11 +103,12 @@ public:
     bool isDebug                () { return false; }
 #endif
 
-    bool        hasTouch            () const;
-    QString     iOSDevice           () const;
-    QString     fixedFontFamily     () const;
-    QString     normalFontFamily    () const;
-    QString     boldFontFamily      () const;
+    bool    hasTouch() const;
+
+    QString  iOSDevice          () const;
+    QString  fixedFontFamily    () const;
+    QString  normalFontFamily   () const;
+    QString  boldFontFamily     () const;
 };
 
 #endif

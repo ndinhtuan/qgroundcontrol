@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
+ *   (c) 2009-2016 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
  * QGroundControl is licensed according to the terms in the file
  * COPYING.md in the root of the source code directory.
@@ -22,7 +22,7 @@ Item {
     width:          joystickRow.width * 1.1
     anchors.top:    parent.top
     anchors.bottom: parent.bottom
-    visible:        globals.activeVehicle ? globals.activeVehicle.sub : false
+    visible:        activeVehicle ? activeVehicle.sub : false
 
 
     Component {
@@ -63,8 +63,8 @@ Item {
                     }
                     QGCLabel { text: qsTr("Enabled:") }
                     QGCLabel {
-                        text:  globals.activeVehicle && globals.activeVehicle.joystickEnabled ? "Yes" : "No"
-                        color: globals.activeVehicle && globals.activeVehicle.joystickEnabled ? qgcPal.buttonText : "red"
+                        text:  activeVehicle && activeVehicle.joystickEnabled ? "Yes" : "No"
+                        color: activeVehicle && activeVehicle.joystickEnabled ? qgcPal.buttonText : "red"
                     }
                 }
             }
@@ -84,14 +84,14 @@ Item {
             sourceSize.height:  height
             source:             "/qmlimages/Joystick.png"
             fillMode:           Image.PreserveAspectFit
-            color:              globals.activeVehicle && globals.activeVehicle.joystickEnabled && joystickManager.activeJoystick ? qgcPal.buttonText : "red"
+            color:              activeVehicle && activeVehicle.joystickEnabled && joystickManager.activeJoystick ? qgcPal.buttonText : "red"
         }
     }
 
     MouseArea {
         anchors.fill:   parent
         onClicked: {
-            mainWindow.showIndicatorPopup(_root, joystickInfo)
+            mainWindow.showPopUp(_root, joystickInfo)
         }
     }
 }

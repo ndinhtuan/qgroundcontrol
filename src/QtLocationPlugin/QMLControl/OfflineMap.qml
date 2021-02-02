@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
+ *   (c) 2009-2016 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
  * QGroundControl is licensed according to the terms in the file
  * COPYING.md in the root of the source code directory.
@@ -36,11 +36,9 @@ Item {
     property var    _settings:          _settingsManager ? _settingsManager.offlineMapsSettings : null
     property var    _fmSettings:        _settingsManager ? _settingsManager.flightMapSettings : null
     property Fact   _mapboxFact:        _settingsManager ? _settingsManager.appSettings.mapboxToken : null
-    property Fact   _mapboxAccountFact: _settingsManager ? _settingsManager.appSettings.mapboxAccount : null
-    property Fact   _mapboxStyleFact:   _settingsManager ? _settingsManager.appSettings.mapboxStyle : null
     property Fact   _esriFact:          _settingsManager ? _settingsManager.appSettings.esriToken : null
 
-    property string mapType:            _fmSettings ? (_fmSettings.mapProvider.value + " " + _fmSettings.mapType.value) : ""
+    property string mapType:            _fmSettings ? (_fmSettings.mapProvider.enumStringValue + " " + _fmSettings.mapType.enumStringValue) : ""
     property bool   isMapInteractive:   false
     property var    savedCenter:        undefined
     property real   savedZoom:          3
@@ -95,8 +93,10 @@ Item {
 
     function updateMap() {
         for (var i = 0; i < _map.supportedMapTypes.length; i++) {
+            //console.log(_map.supportedMapTypes[i].name)
             if (mapType === _map.supportedMapTypes[i].name) {
                 _map.activeMapType = _map.supportedMapTypes[i]
+                //console.log("Update Map:" + " " + _map.activeMapType)
                 handleChanges()
                 return
             }
@@ -105,7 +105,7 @@ Item {
 
     function addNewSet() {
         isMapInteractive = true
-        mapType = _fmSettings.mapProvider.value + " " + _fmSettings.mapType.value
+        mapType = _fmSettings.mapProvider.enumStringValue + " " + _fmSettings.mapType.enumStringValue
         resetMapToDefaults()
         handleChanges()
         _map.visible = true
@@ -212,6 +212,7 @@ Item {
         id:             fileDialog
         folder:         QGroundControl.settingsManager.appSettings.missionSavePath
         nameFilters:    ["Tile Sets (*.qgctiledb)"]
+        fileExtension:  "qgctiledb"
 
         onAcceptedForSave: {
             if (QGroundControl.mapEngineManager.exportSets(file)) {
@@ -315,40 +316,6 @@ Item {
                         wrapMode:       Text.WordWrap
                         text:           qsTr("To enable Mapbox maps, enter your access token.")
                         visible:        _mapboxFact ? _mapboxFact.visible : false
-                        font.pointSize: _adjustableFontPointSize
-                    }
-
-                    Item { width: 1; height: 1; visible: _mapboxAccountFact ? _mapboxAccountFact.visible : false }
-                    QGCLabel { text: qsTr("Mapbox User Name"); visible: _mapboxAccountFact ? _mapboxAccountFact.visible : false }
-                    FactTextField {
-                        fact:               _mapboxAccountFact
-                        visible:            _mapboxAccountFact ? _mapboxAccountFact.visible : false
-                        maximumLength:      256
-                        width:              ScreenTools.defaultFontPixelWidth * 30
-                    }
-                    QGCLabel {
-                        anchors.left:   parent.left
-                        anchors.right:  parent.right
-                        wrapMode:       Text.WordWrap
-                        text:           qsTr("To enable custom Mapbox styles, enter your account name.")
-                        visible:        _mapboxAccountFact ? _mapboxAccountFact.visible : false
-                        font.pointSize: _adjustableFontPointSize
-                    }
-
-                    Item { width: 1; height: 1; visible: _mapboxStyleFact ? _mapboxStyleFact.visible : false }
-                    QGCLabel { text: qsTr("Mapbox Style ID"); visible: _mapboxStyleFact ? _mapboxStyleFact.visible : false }
-                    FactTextField {
-                        fact:               _mapboxStyleFact
-                        visible:            _mapboxStyleFact ? _mapboxStyleFact.visible : false
-                        maximumLength:      256
-                        width:              ScreenTools.defaultFontPixelWidth * 30
-                    }
-                    QGCLabel {
-                        anchors.left:   parent.left
-                        anchors.right:  parent.right
-                        wrapMode:       Text.WordWrap
-                        text:           qsTr("To enable custom Mapbox styles, enter your style ID.")
-                        visible:        _mapboxStyleFact ? _mapboxStyleFact.visible : false
                         font.pointSize: _adjustableFontPointSize
                     }
 
@@ -498,7 +465,7 @@ Item {
                     Row {
                         spacing:    ScreenTools.defaultFontPixelWidth
                         anchors.horizontalCenter: parent.horizontalCenter
-                        visible:    !_defaultSet && mapType !== "Airmap Elevation"
+                        visible:    !_defaultSet && mapType !== "Airmap Elevation Data"
                         QGCLabel {  text: qsTr("Zoom Levels:"); width: infoView._labelWidth; }
                         QGCLabel {  text: offlineMapView._currentSelection ? (offlineMapView._currentSelection.minZoom + " - " + offlineMapView._currentSelection.maxZoom) : ""; horizontalAlignment: Text.AlignRight; width: infoView._valueWidth; }
                     }

@@ -1,13 +1,18 @@
 /****************************************************************************
  *
- * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
+ *   (c) 2009-2016 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
  * QGroundControl is licensed according to the terms in the file
  * COPYING.md in the root of the source code directory.
  *
  ****************************************************************************/
 
-#pragma once
+
+/// @file
+///     @author Don Gagne <don@thegagnes.com>
+
+#ifndef FirmwarePluginManager_H
+#define FirmwarePluginManager_H
 
 #include <QObject>
 
@@ -28,10 +33,10 @@ public:
     ~FirmwarePluginManager();
 
     /// Returns list of firmwares which are supported by the system
-    QList<QGCMAVLink::FirmwareClass_t> supportedFirmwareClasses(void);
+    QList<MAV_AUTOPILOT> supportedFirmwareTypes(void);
 
     /// Returns the list of supported vehicle types for the specified firmware
-    QList<QGCMAVLink::VehicleClass_t> supportedVehicleClasses(QGCMAVLink::FirmwareClass_t firmwareClass);
+    QList<MAV_TYPE> supportedVehicleTypes(MAV_AUTOPILOT firmwareType);
 
     /// Returns appropriate plugin for autopilot type.
     ///     @param firmwareType Type of firmwware to return plugin for.
@@ -40,8 +45,10 @@ public:
     FirmwarePlugin* firmwarePluginForAutopilot(MAV_AUTOPILOT firmwareType, MAV_TYPE vehicleType);
 
 private:
-    FirmwarePluginFactory* _findPluginFactory(QGCMAVLink::FirmwareClass_t firmwareClass);
+    FirmwarePluginFactory* _findPluginFactory(MAV_AUTOPILOT firmwareType);
 
-    FirmwarePlugin*                     _genericFirmwarePlugin;
-    QList<QGCMAVLink::FirmwareClass_t>  _supportedFirmwareClasses;
+    FirmwarePlugin*         _genericFirmwarePlugin;
+    QList<MAV_AUTOPILOT>    _supportedFirmwareTypes;
 };
+
+#endif

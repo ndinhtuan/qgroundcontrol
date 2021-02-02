@@ -40,7 +40,7 @@
 ** 2015.4.4
 ** Adapted for use with QGroundControl
 **
-** Gus Grubba <gus@auterion.com>
+** Gus Grubba <mavlink@grubba.com>
 **
 ****************************************************************************/
 
@@ -81,7 +81,6 @@ private:
     QByteArray              _badMapbox;
     QByteArray              _badTile;
     QTimer                  _timer;
-    static QByteArray       _bingNoTileImage;
     static int              _requestCount;
 };
 

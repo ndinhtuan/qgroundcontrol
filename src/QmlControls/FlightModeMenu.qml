@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
+ *   (c) 2009-2016 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
  * QGroundControl is licensed according to the terms in the file
  * COPYING.md in the root of the source code directory.
@@ -19,8 +19,7 @@ QGCLabel {
     id:     flightModeMenuLabel
     text:   currentVehicle ? currentVehicle.flightMode : qsTr("N/A", "No data to display")
 
-    property var    currentVehicle:         QGroundControl.multiVehicleManager.activeVehicle
-    property real   mouseAreaLeftMargin:    0
+    property var currentVehicle: QGroundControl.multiVehicleManager.activeVehicle
 
     QGCMenu {
         id: flightModesMenu
@@ -61,10 +60,8 @@ QGCLabel {
     }
 
     MouseArea {
-        id:                 mouseArea
-        visible:            currentVehicle && currentVehicle.flightModeSetAvailable
-        anchors.leftMargin: mouseAreaLeftMargin
-        anchors.fill:       parent
-        onClicked:          flightModesMenu.popup()
+        visible:        currentVehicle && currentVehicle.flightModeSetAvailable
+        anchors.fill:   parent
+        onClicked:      flightModesMenu.popup()
     }
 }

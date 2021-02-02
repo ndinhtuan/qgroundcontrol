@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
+ *   (c) 2009-2016 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
  * QGroundControl is licensed according to the terms in the file
  * COPYING.md in the root of the source code directory.
@@ -55,15 +55,20 @@ void LogReplayLinkConfiguration::loadSettings(QSettings& settings, const QString
     settings.endGroup();
 }
 
+void LogReplayLinkConfiguration::updateSettings(void)
+{
+    // Doesn't support changing filename on the fly is already connected
+}
+
 QString LogReplayLinkConfiguration::logFilenameShort(void)
 {
     QFileInfo fi(_logFilename);
     return fi.fileName();
 }
 
-LogReplayLink::LogReplayLink(SharedLinkConfigurationPtr& config)
+LogReplayLink::LogReplayLink(SharedLinkConfigurationPointer& config)
     : LinkInterface     (config)
-    , _logReplayConfig  (qobject_cast<LogReplayLinkConfiguration*>(config.get()))
+    , _logReplayConfig  (qobject_cast<LogReplayLinkConfiguration*>(config.data()))
     , _connected        (false)
     , _playbackSpeed    (1)
 {
@@ -85,7 +90,7 @@ LogReplayLink::LogReplayLink(SharedLinkConfigurationPtr& config)
 
 LogReplayLink::~LogReplayLink(void)
 {
-    disconnect();
+    _disconnect();
 }
 
 bool LogReplayLink::_connect(void)
@@ -93,6 +98,12 @@ bool LogReplayLink::_connect(void)
     // Disallow replay when any links are connected
     if (qgcApp()->toolbox()->multiVehicleManager()->activeVehicle()) {
         emit communicationError(_errorTitle, tr("You must close all connections prior to replaying a log."));
+        return false;
+    }
+
+    _mavlinkChannel = qgcApp()->toolbox()->linkManager()->_reserveMavlinkChannel();
+    if (_mavlinkChannel == 0) {
+        qWarning() << "No mavlink channels available";
         return false;
     }
 
@@ -104,12 +115,17 @@ bool LogReplayLink::_connect(void)
     return true;
 }
 
-void LogReplayLink::disconnect(void)
+void LogReplayLink::_disconnect(void)
 {
     if (_connected) {
         quit();
         wait();
         _connected = false;
+
+        if (_mavlinkChannel != 0) {
+            qgcApp()->toolbox()->linkManager()->_freeMavlinkChannel(_mavlinkChannel);
+        }
+
         emit disconnected();
     }
 }

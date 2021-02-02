@@ -4,14 +4,14 @@ endif()
 
 if(NOT QT_VERSION)
 	# try Qt 5.12.0 if none specified, last LTS.
-	set(QT_VERSION "5.12.5")
+	set(QT_VERSION "5.12.0")
 endif()
 
 if(DEFINED ENV{QT_MKSPEC})
 	set(QT_MKSPEC $ENV{QT_MKSPEC})
 endif()
 
-if(UNIX AND NOT APPLE AND NOT ANDROID)
+if(UNIX AND NOT APPLE)
 	set(LINUX TRUE)
 endif()
 

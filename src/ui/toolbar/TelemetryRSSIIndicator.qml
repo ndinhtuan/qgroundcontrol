@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
+ *   (c) 2009-2016 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
  * QGroundControl is licensed according to the terms in the file
  * COPYING.md in the root of the source code directory.
@@ -22,12 +22,10 @@ Item {
     id:             _root
     anchors.top:    parent.top
     anchors.bottom: parent.bottom
-    width:          telemIcon.width * 1.1
+    width:          _hasTelemetry ? telemIcon.width * 1.1 : 0
+    visible:        _hasTelemetry
 
-    property bool showIndicator: _hasTelemetry
-
-    property var  _activeVehicle:   QGroundControl.multiVehicleManager.activeVehicle
-    property bool _hasTelemetry:    _activeVehicle ? _activeVehicle.telemetryLRSSI !== 0 : false
+    property bool _hasTelemetry:    activeVehicle ? activeVehicle.telemetryLRSSI !== 0 : false
 
     Component {
         id: telemRSSIInfo
@@ -56,19 +54,19 @@ Item {
                     columns:            2
                     anchors.horizontalCenter: parent.horizontalCenter
                     QGCLabel { text: qsTr("Local RSSI:") }
-                    QGCLabel { text: _activeVehicle.telemetryLRSSI + " dBm"}
+                    QGCLabel { text: activeVehicle.telemetryLRSSI + " dBm"}
                     QGCLabel { text: qsTr("Remote RSSI:") }
-                    QGCLabel { text: _activeVehicle.telemetryRRSSI + " dBm"}
+                    QGCLabel { text: activeVehicle.telemetryRRSSI + " dBm"}
                     QGCLabel { text: qsTr("RX Errors:") }
-                    QGCLabel { text: _activeVehicle.telemetryRXErrors }
+                    QGCLabel { text: activeVehicle.telemetryRXErrors }
                     QGCLabel { text: qsTr("Errors Fixed:") }
-                    QGCLabel { text: _activeVehicle.telemetryFixed }
+                    QGCLabel { text: activeVehicle.telemetryFixed }
                     QGCLabel { text: qsTr("TX Buffer:") }
-                    QGCLabel { text: _activeVehicle.telemetryTXBuffer }
+                    QGCLabel { text: activeVehicle.telemetryTXBuffer }
                     QGCLabel { text: qsTr("Local Noise:") }
-                    QGCLabel { text: _activeVehicle.telemetryLNoise }
+                    QGCLabel { text: activeVehicle.telemetryLNoise }
                     QGCLabel { text: qsTr("Remote Noise:") }
-                    QGCLabel { text: _activeVehicle.telemetryRNoise }
+                    QGCLabel { text: activeVehicle.telemetryRNoise }
                 }
             }
         }
@@ -86,7 +84,7 @@ Item {
     MouseArea {
         anchors.fill: parent
         onClicked: {
-            mainWindow.showIndicatorPopup(_root, telemRSSIInfo)
+            mainWindow.showPopUp(_root, telemRSSIInfo)
         }
     }
 }

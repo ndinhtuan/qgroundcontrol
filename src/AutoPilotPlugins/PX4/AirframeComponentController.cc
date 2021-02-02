@@ -1,18 +1,21 @@
 /****************************************************************************
  *
- * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
+ *   (c) 2009-2016 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
  * QGroundControl is licensed according to the terms in the file
  * COPYING.md in the root of the source code directory.
  *
  ****************************************************************************/
 
+
+/// @file
+///     @author Don Gagne <don@thegagnes.com>
+
 #include "AirframeComponentController.h"
 #include "AirframeComponentAirframes.h"
 #include "QGCMAVLink.h"
 #include "MultiVehicleManager.h"
 #include "QGCApplication.h"
-#include "LinkManager.h"
 
 #include <QVariant>
 #include <QQmlProperty>
@@ -82,7 +85,7 @@ AirframeComponentController::~AirframeComponentController()
 void AirframeComponentController::changeAutostart(void)
 {
     if (qgcApp()->toolbox()->multiVehicleManager()->vehicles()->count() > 1) {
-        qgcApp()->showAppMessage(tr("You cannot change airframe configuration while connected to multiple vehicles."));
+        qgcApp()->showMessage(tr("You cannot change airframe configuration while connected to multiple vehicles."));
 		return;
 	}
 	

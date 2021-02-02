@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
+ *   (c) 2009-2016 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
  * QGroundControl is licensed according to the terms in the file
  * COPYING.md in the root of the source code directory.
@@ -8,7 +8,7 @@
  ****************************************************************************/
 
 import QtQuick          2.3
-import QtQuick.Controls 2.4
+import QtQuick.Controls 1.2
 import QtQuick.Dialogs  1.2
 import QtQuick.Layouts  1.11
 
@@ -90,15 +90,13 @@ SetupPage {
                 QGCViewDialog {
 
                     function accept() {
-                        controller.spektrumBindMode(radioGroup.checkedButton.bindMode)
+                        controller.spektrumBindMode(radioGroup.current.bindMode)
                         hideDialog()
                     }
 
                     function reject() {
                         hideDialog()
                     }
-
-                    ButtonGroup { id: radioGroup }
 
                     Column {
                         anchors.fill:   parent
@@ -111,21 +109,18 @@ SetupPage {
                         }
 
                         QGCRadioButton {
-                            text:               qsTr("DSM2 Mode")
-                            ButtonGroup.group:  radioGroup
+                            text:       qsTr("DSM2 Mode")
                             property int bindMode: RadioComponentController.DSM2
                         }
 
                         QGCRadioButton {
-                            text:               qsTr("DSMX (7 channels or less)")
-                            ButtonGroup.group:  radioGroup
+                            text:       qsTr("DSMX (7 channels or less)")
                             property int bindMode: RadioComponentController.DSMX7
                         }
 
                         QGCRadioButton {
-                            checked:            true
-                            text:               qsTr("DSMX (8 channels or more)")
-                            ButtonGroup.group:  radioGroup
+                            checked:    true
+                            text:       qsTr("DSMX (8 channels or more)")
                             property int bindMode: RadioComponentController.DSMX8
                         }
                     }
@@ -160,7 +155,7 @@ SetupPage {
                     // Center point
                     Rectangle {
                         anchors.horizontalCenter:   parent.horizontalCenter
-                        width:                      globals.defaultTextWidth / 2
+                        width:                      defaultTextWidth / 2
                         height:                     parent.height
                         color:                      qgcPal.window
                     }
@@ -210,10 +205,10 @@ SetupPage {
 
                     Item {
                         width:  parent.width
-                        height: globals.defaultTextHeight * 2
+                        height: defaultTextHeight * 2
                         QGCLabel {
                             id:     rollLabel
-                            width:  globals.defaultTextWidth * 10
+                            width:  defaultTextWidth * 10
                             text:   qsTr("Roll")
                         }
 
@@ -221,10 +216,11 @@ SetupPage {
                             id:                 rollLoader
                             anchors.left:       rollLabel.right
                             anchors.right:      parent.right
-                            height:             globals.defaultTextHeight
+                            height:             defaultTextHeight
                             width:              100
                             sourceComponent:    channelMonitorDisplayComponent
 
+                            property real defaultTextWidth: defaultTextWidth
                             property bool mapped:           controller.rollChannelMapped
                             property bool reversed:         controller.rollChannelReversed
                         }
@@ -238,11 +234,11 @@ SetupPage {
 
                     Item {
                         width:  parent.width
-                        height: globals.defaultTextHeight * 2
+                        height: defaultTextHeight * 2
 
                         QGCLabel {
                             id:     pitchLabel
-                            width:  globals.defaultTextWidth * 10
+                            width:  defaultTextWidth * 10
                             text:   qsTr("Pitch")
                         }
 
@@ -250,10 +246,11 @@ SetupPage {
                             id:                 pitchLoader
                             anchors.left:       pitchLabel.right
                             anchors.right:      parent.right
-                            height:             globals.defaultTextHeight
+                            height:             defaultTextHeight
                             width:              100
                             sourceComponent:    channelMonitorDisplayComponent
 
+                            property real defaultTextWidth: defaultTextWidth
                             property bool mapped:           controller.pitchChannelMapped
                             property bool reversed:         controller.pitchChannelReversed
                         }
@@ -267,11 +264,11 @@ SetupPage {
 
                     Item {
                         width:  parent.width
-                        height: globals.defaultTextHeight * 2
+                        height: defaultTextHeight * 2
 
                         QGCLabel {
                             id:     yawLabel
-                            width:  globals.defaultTextWidth * 10
+                            width:  defaultTextWidth * 10
                             text:   qsTr("Yaw")
                         }
 
@@ -279,10 +276,11 @@ SetupPage {
                             id:                 yawLoader
                             anchors.left:       yawLabel.right
                             anchors.right:      parent.right
-                            height:             globals.defaultTextHeight
+                            height:             defaultTextHeight
                             width:              100
                             sourceComponent:    channelMonitorDisplayComponent
 
+                            property real defaultTextWidth: defaultTextWidth
                             property bool mapped:           controller.yawChannelMapped
                             property bool reversed:         controller.yawChannelReversed
                         }
@@ -296,11 +294,11 @@ SetupPage {
 
                     Item {
                         width:  parent.width
-                        height: globals.defaultTextHeight * 2
+                        height: defaultTextHeight * 2
 
                         QGCLabel {
                             id:     throttleLabel
-                            width:  globals.defaultTextWidth * 10
+                            width:  defaultTextWidth * 10
                             text:   qsTr("Throttle")
                         }
 
@@ -308,10 +306,11 @@ SetupPage {
                             id:                 throttleLoader
                             anchors.left:       throttleLabel.right
                             anchors.right:      parent.right
-                            height:             globals.defaultTextHeight
+                            height:             defaultTextHeight
                             width:              100
                             sourceComponent:    channelMonitorDisplayComponent
 
+                            property real defaultTextWidth: defaultTextWidth
                             property bool mapped:           controller.throttleChannelMapped
                             property bool reversed:         controller.throttleChannelReversed
                         }

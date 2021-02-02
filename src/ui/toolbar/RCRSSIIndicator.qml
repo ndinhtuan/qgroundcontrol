@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
+ *   (c) 2009-2016 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
  * QGroundControl is licensed according to the terms in the file
  * COPYING.md in the root of the source code directory.
@@ -23,11 +23,9 @@ Item {
     width:          rssiRow.width * 1.1
     anchors.top:    parent.top
     anchors.bottom: parent.bottom
+    visible:        activeVehicle ? activeVehicle.supportsRadio : true
 
-    property bool showIndicator: _activeVehicle.supportsRadio
-
-    property var    _activeVehicle:     QGroundControl.multiVehicleManager.activeVehicle
-    property bool   _rcRSSIAvailable:   _activeVehicle ? _activeVehicle.rcRSSI > 0 && _activeVehicle.rcRSSI <= 100 : false
+    property bool   _rcRSSIAvailable:   activeVehicle ? activeVehicle.rcRSSI > 0 && activeVehicle.rcRSSI <= 100 : false
 
     Component {
         id: rcRSSIInfo
@@ -48,7 +46,7 @@ Item {
 
                 QGCLabel {
                     id:             rssiLabel
-                    text:           _activeVehicle ? (_activeVehicle.rcRSSI !== 255 ? qsTr("RC RSSI Status") : qsTr("RC RSSI Data Unavailable")) : qsTr("N/A", "No data available")
+                    text:           activeVehicle ? (activeVehicle.rcRSSI !== 255 ? qsTr("RC RSSI Status") : qsTr("RC RSSI Data Unavailable")) : qsTr("N/A", "No data available")
                     font.family:    ScreenTools.demiboldFontFamily
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
@@ -62,7 +60,7 @@ Item {
                     anchors.horizontalCenter: parent.horizontalCenter
 
                     QGCLabel { text: qsTr("RSSI:") }
-                    QGCLabel { text: _activeVehicle ? (_activeVehicle.rcRSSI + "%") : 0 }
+                    QGCLabel { text: activeVehicle ? (activeVehicle.rcRSSI + "%") : 0 }
                 }
             }
         }
@@ -88,14 +86,14 @@ Item {
         SignalStrength {
             anchors.verticalCenter: parent.verticalCenter
             size:                   parent.height * 0.5
-            percent:                _rcRSSIAvailable ? _activeVehicle.rcRSSI : 0
+            percent:                _rcRSSIAvailable ? activeVehicle.rcRSSI : 0
         }
     }
 
     MouseArea {
         anchors.fill:   parent
         onClicked: {
-            mainWindow.showIndicatorPopup(_root, rcRSSIInfo)
+            mainWindow.showPopUp(_root, rcRSSIInfo)
         }
     }
 }

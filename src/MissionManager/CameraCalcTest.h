@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
+ *   (c) 2009-2016 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
  * QGroundControl is licensed according to the terms in the file
  * COPYING.md in the root of the source code directory.
@@ -12,7 +12,6 @@
 #include "UnitTest.h"
 #include "MultiSignalSpy.h"
 #include "CameraCalc.h"
-#include "PlanMasterController.h"
 
 #include <QGeoCoordinate>
 
@@ -51,8 +50,7 @@ private:
     static const size_t _cSignals = maxSignalIndex;
     const char*         _rgSignals[_cSignals];
 
-    PlanMasterController*   _masterController =     nullptr;
-    Vehicle*                _controllerVehicle =    nullptr;
-    MultiSignalSpy*         _multiSpy =             nullptr;
-    CameraCalc*             _cameraCalc =           nullptr;
+    Vehicle*        _offlineVehicle;
+    MultiSignalSpy* _multiSpy;
+    CameraCalc*     _cameraCalc;
 };

@@ -1,6 +1,6 @@
  /****************************************************************************
  *
- * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
+ *   (c) 2009-2016 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
  * QGroundControl is licensed according to the terms in the file
  * COPYING.md in the root of the source code directory.
@@ -30,7 +30,6 @@
 #include "QGCOptions.h"
 #include "SettingsManager.h"
 #include "QGCApplication.h"
-#include "ADSBVehicleManager.h"
 #if defined(QGC_ENABLE_PAIRING)
 #include "PairingManager.h"
 #endif
@@ -74,7 +73,6 @@ QGCToolbox::QGCToolbox(QGCApplication* app)
     _followMe               = new FollowMe                  (app, this);
     _videoManager           = new VideoManager              (app, this);
     _mavlinkLogManager      = new MAVLinkLogManager         (app, this);
-    _adsbVehicleManager     = new ADSBVehicleManager        (app, this);
 #if defined(QGC_ENABLE_PAIRING)
     _pairingManager         = new PairingManager            (app, this);
 #endif
@@ -98,7 +96,6 @@ void QGCToolbox::setChildToolboxes(void)
 {
     // SettingsManager must be first so settings are available to any subsequent tools
     _settingsManager->setToolbox(this);
-
     _corePlugin->setToolbox(this);
     _audioOutput->setToolbox(this);
     _factSystem->setToolbox(this);
@@ -119,7 +116,6 @@ void QGCToolbox::setChildToolboxes(void)
     _videoManager->setToolbox(this);
     _mavlinkLogManager->setToolbox(this);
     _airspaceManager->setToolbox(this);
-    _adsbVehicleManager->setToolbox(this);
 #if defined(QGC_GST_TAISYNC_ENABLED)
     _taisyncManager->setToolbox(this);
 #endif
@@ -135,13 +131,13 @@ void QGCToolbox::_scanAndLoadPlugins(QGCApplication* app)
 {
 #if defined (QGC_CUSTOM_BUILD)
     //-- Create custom plugin (Static)
-    _corePlugin = (QGCCorePlugin*) new CUSTOMCLASS(app, this);
+    _corePlugin = (QGCCorePlugin*) new CUSTOMCLASS(app, app->toolbox());
     if(_corePlugin) {
         return;
     }
 #endif
     //-- No plugins found, use default instance
-    _corePlugin = new QGCCorePlugin(app, this);
+    _corePlugin = new QGCCorePlugin(app, app->toolbox());
 }
 
 QGCTool::QGCTool(QGCApplication* app, QGCToolbox* toolbox)

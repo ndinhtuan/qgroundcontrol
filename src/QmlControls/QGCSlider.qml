@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
+ *   (c) 2009-2016 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
  * QGroundControl is licensed according to the terms in the file
  * COPYING.md in the root of the source code directory.
@@ -23,14 +23,11 @@ Slider {
     property bool zeroCentered: false
     property bool displayValue: false
 
-
-
-
     style: SliderStyle {
         groove: Item {
             anchors.verticalCenter: parent.verticalCenter
-            implicitWidth:          Math.round(ScreenTools.defaultFontPixelHeight * 4.5)
-            implicitHeight:         Math.round(ScreenTools.defaultFontPixelHeight * 0.3)
+            implicitWidth:  Math.round(ScreenTools.defaultFontPixelHeight * 4.5)
+            implicitHeight: Math.round(ScreenTools.defaultFontPixelHeight * 0.3)
 
             Rectangle {
                 radius:         height / 2
@@ -69,11 +66,9 @@ Slider {
             implicitWidth:  _radius * 2
             implicitHeight: _radius * 2
             radius:         _radius
-
-            property real _radius: Math.round(_root.implicitHeight / 2)
-
+            property real _radius: Math.round(ScreenTools.defaultFontPixelHeight * 0.75)
             Label {
-                text:               _root.value.toFixed( _root.maximumValue <= 1 ? 1 : 0)
+                text:               _root.value.toFixed(0)
                 visible:            _root.displayValue
                 anchors.centerIn:   parent
                 font.family:        ScreenTools.normalFontFamily

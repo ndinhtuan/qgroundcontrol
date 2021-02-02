@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
+ *   (c) 2017 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
  * QGroundControl is licensed according to the terms in the file
  * COPYING.md in the root of the source code directory.
@@ -19,11 +19,10 @@ import QGroundControl.Palette               1.0
 //-- GPS Indicator
 Item {
     id:             _root
-    width:          (gpsValuesColumn.x + gpsValuesColumn.width) * 1.1
+    width:          visible ? (gpsValuesColumn.x + gpsValuesColumn.width) * 1.1 : 0
     anchors.top:    parent.top
     anchors.bottom: parent.bottom
-
-    property bool showIndicator: QGroundControl.gpsRtk.connected.value
+    visible:        QGroundControl.gpsRtk.connected.value
 
     Component {
         id: gpsInfo
@@ -71,7 +70,7 @@ Item {
                         visible: QGroundControl.gpsRtk.currentAccuracy.value > 0
                         }
                     QGCLabel {
-                        text: QGroundControl.gpsRtk.currentAccuracy.valueString + " " + QGroundControl.unitsConversion.appSettingsHorizontalDistanceUnitsString
+                        text: QGroundControl.gpsRtk.currentAccuracy.valueString + " " + QGroundControl.appSettingsDistanceUnitsString
                         visible: QGroundControl.gpsRtk.currentAccuracy.value > 0
                         }
                     QGCLabel { text: qsTr("Satellites:") }
@@ -109,7 +108,7 @@ Item {
     MouseArea {
         anchors.fill:   parent
         onClicked: {
-            mainWindow.showIndicatorPopup(_root, gpsInfo)
+            mainWindow.showPopUp(_root, gpsInfo)
         }
     }
 }

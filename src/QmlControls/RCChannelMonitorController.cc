@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
+ *   (c) 2009-2016 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
  * QGroundControl is licensed according to the terms in the file
  * COPYING.md in the root of the source code directory.
@@ -18,7 +18,9 @@ RCChannelMonitorController::RCChannelMonitorController(void)
 
 void RCChannelMonitorController::_rcChannelsChanged(int channelCount, int pwmValues[Vehicle::cMaxRcChannels])
 {
-    for (int channel=0; channel<channelCount; channel++) {
+    int maxChannel = std::min(channelCount, _chanMax());
+
+    for (int channel=0; channel<maxChannel; channel++) {
         int channelValue = pwmValues[channel];
 
         if (_chanCount != channelCount) {
@@ -30,4 +32,9 @@ void RCChannelMonitorController::_rcChannelsChanged(int channelCount, int pwmVal
             emit channelRCValueChanged(channel, channelValue);
         }
     }
+}
+
+int RCChannelMonitorController::_chanMax(void) const
+{
+    return _vehicle->firmwareType() == MAV_AUTOPILOT_PX4 ? _chanMaxPX4 : _chanMaxAPM;
 }
