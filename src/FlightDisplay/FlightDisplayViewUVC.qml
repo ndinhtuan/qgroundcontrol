@@ -19,10 +19,13 @@ Rectangle {
     width:              parent.width
     height:             parent.height
     color:              Qt.rgba(0,0,0,0.75)
-    clip:               true
+    visible: true
+    property alias rectangle: rectangle
+    clip:               false
     anchors.centerIn:   parent
     property int numGridRow: 3
     property int numGridCol: 5
+    property var    _videoStreamSettings:                       QGroundControl.settingsManager.videoSettings
     function adjustAspectRatio()
     {
         //-- Set aspect ratio
@@ -70,6 +73,7 @@ Rectangle {
 
 //    }
     MouseArea {
+        id: mouseArea
       property vector2d dragStart
       acceptedButtons: Qt.LeftButton
       anchors.fill: parent
@@ -83,15 +87,30 @@ Rectangle {
         if(pressed) {
           mouseRect.x = Math.min(mouseX, dragStart.x)
           mouseRect.width = Math.abs(mouseX - dragStart.x)
-          mouseRect.y = Math.min(mouseY, dragStart.y)
-          mouseRect.height = Math.abs(mouseY - dragStart.y)
+            mouseRect.y = Math.min(mouseY, dragStart.y)
+            mouseRect.height = Math.abs(mouseY - dragStart.y)
         }
+      }
+
+      Rectangle {
+          id: rectangle
+          y: _root.height/2 - _root.height/6
+          width: _root.height/3
+          height: _root.height/3
+          color: "#00000000"
+          radius:  _root.height/6
+          anchors.horizontalCenterOffset: 0
+          transformOrigin: Item.Center
+          anchors.horizontalCenter: parent.horizontalCenter
+          border.width: 5
+          border.color: _videoStreamSettings.gridLines.rawValue ? "#131723" : "#00000000"
       }
     }
 
+
     Rectangle {
       id: mouseRect
-      color: "#808080ff"
+      color: _videoStreamSettings.gridLines.rawValue ? "#131723" : "#00000000"
     }
 
     Column {
@@ -103,7 +122,7 @@ Rectangle {
           height: _root.height / _root.numGridRow
           color: "transparent"
           border {
-            color: "black"
+            color: _videoStreamSettings.gridLines.rawValue ? "#131723" : "#00000000"
             width: 1
           }
         }
@@ -119,7 +138,7 @@ Rectangle {
           height: _root.height
           color: "transparent"
           border {
-            color: "black"
+            color: _videoStreamSettings.gridLines.rawValue ? "#131723" : "#00000000"
             width: 1
           }
         }
